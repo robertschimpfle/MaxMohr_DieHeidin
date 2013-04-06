@@ -6,9 +6,6 @@
 \usepackage[german]{babel}
 \usepackage[paperwidth=135mm,paperheight=215mm]{geometry}
 
-%\usepackage{bookman}
-%\usepackage[T1]{fontenc}
-
 %\linespread{1.00}
 
 \typearea[5mm]{11}
@@ -43,13 +40,10 @@
 \def\ae{\frqq}
 
 % Eingriff in Text der Vorlage.
-\def\eingriff#1{\linelabel{\theenmark}\endnote{\makebox{%
-\begin{minipage}{3em}\pageref{\theenmark}, \ref{\theenmark}\end{minipage}#1}}}
+\def\eingriff#1{\linelabel{\theenmark}\endnote{\pageref{\theenmark},
+\ref{\theenmark} #1}}
 
 \def\kapitel#1{\cleardoublepage\parbox[c][6ex]{1cm}{}\addsec{#1}}
-
-%\setkomafont{chapterentry}{\bfseries}
-%\setkomafont{partentry}{\normalsize\bfseries}
 
 % ***************** Definitionen, Makros Ende ******************
 % --------------------------------------------------------------
@@ -84,7 +78,7 @@ Dieses Buch wurde erstellt mit \LaTeX und
 % Ab hier Zeilennummer pro Seite erfassen.
 \linenumbers
 \setpagewiselinenumbers
-\modulolinenumbers[100] % Zum Ausblenden z. B. Wert 100 einsetzen.
+\modulolinenumbers[5] % Zum Ausblenden z. B. Wert 100 einsetzen.
 
 \addchap{Erster Teil}
 \include{1_erstes_kapitel}
