@@ -40,8 +40,8 @@
 \def\ae{\frqq}
 
 % Eingriff in Text der Vorlage.
-\def\eingriff#1{\linelabel{\theenmark}\endnote{\pageref{\theenmark},
-\ref{\theenmark} #1}}
+\def\eingriff#1{\linelabel{\theenmark}\endnote{\makebox[0em][r]
+{\pageref{\theenmark}}, \makebox[1em][r]{\ref{\theenmark}}\makebox[1em]{}#1}}
 
 \def\kapitel#1{\cleardoublepage\parbox[c][6ex]{1cm}{}\addsec{#1}}
 
