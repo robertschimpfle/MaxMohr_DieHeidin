@@ -1,0 +1,121 @@
+\documentclass[fontsize=11pt,headings=small]{scrbook}
+
+\setlength{\parskip}{0pt}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[german]{babel}
+\usepackage[paperwidth=135mm,paperheight=215mm]{geometry}
+
+%\usepackage{bookman}
+%\usepackage[T1]{fontenc}
+
+%\linespread{1.00}
+
+\typearea[5mm]{11}
+
+\usepackage{lmodern}
+
+\usepackage{endnotes}
+
+\usepackage[pagewise]{lineno}
+
+\begin{document}
+
+
+
+
+% --------------------------------------------------------------
+% **************** Definitionen, Makros Anfang *****************
+
+% Keine Kopfzeile, aber Seitennummer.
+\pagestyle{plain}
+
+% Marker für Endnote im Text entfernen.
+\def\makeenmark{}
+
+% Abstand zwischen Absätzen.
+\def\abstand{\\\parbox[t][1ex]{1cm}{}\\}
+
+% Anführungszeichen links.
+\def\aa{\flqq}
+
+% Anführungszeichen rechts.
+\def\ae{\frqq}
+
+% Eingriff in Text der Vorlage.
+\def\eingriff#1{\linelabel{\theenmark}\endnote{\makebox{%
+\begin{minipage}{3em}\pageref{\theenmark}, \ref{\theenmark}\end{minipage}#1}}}
+
+\def\kapitel#1{\cleardoublepage\parbox[c][6ex]{1cm}{}\addsec{#1}}
+
+%\setkomafont{chapterentry}{\bfseries}
+%\setkomafont{partentry}{\normalsize\bfseries}
+
+% ***************** Definitionen, Makros Ende ******************
+% --------------------------------------------------------------
+
+
+
+
+% --------------------------------------------------------------
+% ********************** Vorspann Anfang ***********************
+
+\author{Max Mohr}
+\title{Die Heidin}
+\date{}
+\lowertitleback{Version 0.7.23.479 (6. April 2013, 12:28:17)
+
+Dieses Buch wurde erstellt mit \LaTeX und
+\KOMAScript.}
+
+\maketitle
+
+% *********************** Vorspann Ende ************************
+% --------------------------------------------------------------
+
+
+
+
+% --------------------------------------------------------------
+% *********************** Roman Anfang *************************
+
+\addpart{Die Heidin}
+
+% Ab hier Zeilennummer pro Seite erfassen.
+\linenumbers
+\setpagewiselinenumbers
+\modulolinenumbers[100] % Zum Ausblenden z. B. Wert 100 einsetzen.
+
+\addchap{Erster Teil}
+\include{1_erstes_kapitel}
+\include{1_zweites_kapitel}
+
+\addchap{Zweiter Teil}
+\include{2_erstes_kapitel}
+\include{2_zweites_kapitel}
+
+% Ab hier Zeilennummern wieder aus.
+\endlinenumbers
+
+% ************************ Roman Ende **************************
+% --------------------------------------------------------------
+
+
+
+
+% --------------------------------------------------------------
+% *********************** Anhang Anfang ************************
+
+\addpart{Anhang}
+
+\addsec{Eingriffe in den Text}
+\def\enotesize{\normalsize}
+\theendnotes
+
+\tableofcontents
+
+% ************************ Anhang Ende *************************
+% --------------------------------------------------------------
+
+
+\end{document}
