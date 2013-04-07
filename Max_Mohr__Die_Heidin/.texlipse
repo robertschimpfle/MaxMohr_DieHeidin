@@ -1,5 +1,5 @@
 #TeXlipse project settings
-#Sat Apr 06 20:50:25 CEST 2013
+#Sun Apr 07 22:48:17 CEST 2013
 markTmpDer=true
 builderNum=2
 outputDir=build/
@@ -11,4 +11,4 @@ mainTexFile=text.tex
 outputFile=text.pdf
 langSpell=
 markDer=true
-srcDir=
+srcDir=src/main/latex/
