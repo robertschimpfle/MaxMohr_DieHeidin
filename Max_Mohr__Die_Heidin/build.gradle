@@ -1,11 +1,12 @@
 task pdf {
 	doLast {
-		def proc = "pdflatex text.tex".execute()
+		def command = "pdflatex -output-directory build text.tex"
+		def proc = command.execute()
 		proc.in.eachLine {line -> println line} 
 		proc.err.eachLine {line -> println 'ERROR: ' + line} 
 		proc.waitFor()
 
-		proc = "pdflatex text.tex".execute()
+		proc = command.execute()
 		proc.in.eachLine {line -> println line} 
 		proc.err.eachLine {line -> println 'ERROR: ' + line} 
 		proc.waitFor()
