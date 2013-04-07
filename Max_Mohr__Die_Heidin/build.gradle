@@ -1,5 +1,11 @@
 task pdf {
 	doLast {
+		def dircommand = "mkdir build"
+		def dirproc = dircommand.execute()
+		dirproc.in.eachLine {line -> println line} 
+		dirproc.err.eachLine {line -> println 'ERROR: ' + line} 
+		dirproc.waitFor()
+	
 		def command = "pdflatex -output-directory build text.tex"
 		def proc = command.execute()
 		proc.in.eachLine {line -> println line} 
