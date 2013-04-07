@@ -13,3 +13,8 @@ def run_command(command) {
 	proc.err.eachLine {line -> println 'ERROR: ' + line} 
 	proc.waitFor()
 }
+
+task buildPdf(type: Exec) {
+	commandLine 'pdflatex -output-directory build text.tex'
+	//standardOutput = new ByteArrayOutputStream()
+}
