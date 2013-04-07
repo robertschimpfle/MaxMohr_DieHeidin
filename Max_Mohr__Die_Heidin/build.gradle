@@ -1,7 +1,7 @@
 task pdf {
 	doLast {
 		run_command "mkdir build"
-		def pdf_command = "pdflatex -output-directory build text.tex"
+		def pdf_command = "pdflatex -output-directory build src/main/latex/777777777777777text.tex"
 		run_command pdf_command
 		run_command pdf_command
 	}
@@ -17,4 +17,8 @@ def run_command(command) {
 task buildPdf(type: Exec) {
 	commandLine 'pdflatex -output-directory build text.tex'
 	//standardOutput = new ByteArrayOutputStream()
+}
+
+task replaceVersionInfo(type: Copy) {
+	from 'src/main/latex'
 }
