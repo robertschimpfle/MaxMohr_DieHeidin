@@ -5,7 +5,7 @@ task pdf {
 		proc.err.eachLine {line -> println 'ERROR: ' + line} 
 		proc.waitFor()
 
-		def proc = "pdflatex text.tex".execute()
+		proc = "pdflatex text.tex".execute()
 		proc.in.eachLine {line -> println line} 
 		proc.err.eachLine {line -> println 'ERROR: ' + line} 
 		proc.waitFor()
