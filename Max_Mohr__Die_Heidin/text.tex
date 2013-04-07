@@ -1,4 +1,4 @@
-\documentclass[fontsize=11pt,headings=small]{scrbook}
+\documentclass[fontsize=11pt,headings=small,]{scrbook}
 
 \setlength{\parskip}{0pt}
 \usepackage[utf8]{inputenc}
@@ -15,6 +15,8 @@
 \usepackage{endnotes}
 
 \usepackage[pagewise]{lineno}
+
+\usepackage{lipsum}
 
 \begin{document}
 
@@ -43,7 +45,16 @@
 \def\eingriff#1{\linelabel{\theenmark}\endnote{\makebox[0em][r]
 {\pageref{\theenmark}}, \makebox[1em][r]{\ref{\theenmark}}\makebox[1em]{}#1}}
 
-\def\kapitel#1{\cleardoublepage\parbox[c][6ex]{1cm}{}\addsec{#1}}
+% Kapitelüberschrift.
+\def\kapitel#1{
+\cleardoublepage
+\parbox[c][6ex]{1cm}{}\addsec{#1}}
+
+% Partseiten ohne Seitenzahl.
+\renewcommand*{\partpagestyle}{empty}
+
+% Chapterseiten ohne Seitenzahl.
+\renewcommand*{\chapterpagestyle}{empty}
 
 % ***************** Definitionen, Makros Ende ******************
 % --------------------------------------------------------------
