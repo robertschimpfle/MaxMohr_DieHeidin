@@ -1,5 +1,5 @@
 task pdf {
 	doLast {
-		println "ok erstmal"
+		"pdflatex text.tex".execute()
 	}
 }
