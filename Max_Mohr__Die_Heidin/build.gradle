@@ -1,5 +1,8 @@
 task pdf {
 	doLast {
-		"pdflatex text.tex".execute()
+		def proc = "pdflatex text.tex".execute()
+		proc.in.eachLine {line -> println line} 
+		proc.err.eachLine {line -> println 'ERROR: ' + line} 
+		proc.waitFor()
 	}
 }
