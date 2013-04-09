@@ -1,7 +1,7 @@
 import java.text.SimpleDateFormat
 
-def srcdir = 'src/main/latex'
-def buildsrcdir = 'build'
+def srcDir = 'src/main/latex'
+def buildSrcDir = 'build'
 
 task prepare(type: Exec) {
 	commandLine 'mkdir', '-p', 'build'
@@ -12,8 +12,8 @@ task clean(type: Exec, dependsOn: prepare) {
 }
 
 task replaceVersionInfo(type: Copy, dependsOn: clean) {
-	from srcdir
-	into buildsrcdir
+	from srcDir
+	into buildSrcDir
 	include '**/*.tex'
 	filter { line ->
 		line.replace("@version@", bookVersion)
@@ -25,12 +25,21 @@ task replaceVersionInfo(type: Copy, dependsOn: clean) {
 
 task latexFirstRun(type: Exec, dependsOn: replaceVersionInfo) {
 	commandLine 'pdflatex', '-output-directory', '.', 'text.tex'
-	workingDir buildsrcdir
+	workingDir buildSrcDir
 }
 
 task latexSecondRun(type: Exec, dependsOn: latexFirstRun) {
 	commandLine 'pdflatex', '-output-directory', '.', 'text.tex'
-	workingDir buildsrcdir
+	workingDir buildSrcDir
+}
+
+task checkTexFiles() {
+	def inputFiles  = files { fileTree(dir: srcDir, includes: ['*.tex']) }
+	inputs.files inputFiles
+	
+	doLast {
+		inputFiles.each { logger.warn("Warning: file too blubb") }
+	}
 }
 
 task pdf(dependsOn: latexSecondRun) {
