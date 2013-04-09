@@ -39,12 +39,6 @@
 % Abstand zwischen Absätzen.
 \def\abstand{\\\parbox[t][1ex]{1cm}{}\\}
 
-% Anführungszeichen links.
-\def\aa{\flqq}
-
-% Anführungszeichen rechts.
-\def\ae{\frqq}
-
 % Eingriff in Text der Vorlage.
 \def\eingriff#1{\linelabel{\theenmark}\endnote{\makebox[0em][r]
 {\pageref{\theenmark}}, \makebox[1em][r]{\ref{\theenmark}}\makebox[1em]{}#1}}
@@ -60,8 +54,23 @@
 % Chapterseiten ohne Seitenzahl.
 \renewcommand*{\chapterpagestyle}{empty}
 
+% Anführungszeichen links.
+\def\aa{\flqq\kern .05em}
+
+% Anführungszeichen rechts.
+\def\ae{\kern .05em\frqq}
+
 % Doppelpunkt.
-\def\dp{:}
+%\def\dopp{\thinspace{\kern .08em} :}
+\def\dopp{\kern .03em :}
+
+% Fragezeichen.
+\def\frag{\kern .05em ?}
+
+% Ausrufezeichen.
+\def\ausr{\kern .05em !}
+
+\def\punkte{\kern .08em \ldots}
 
 % ***************** Definitionen, Makros Ende ******************
 % --------------------------------------------------------------
@@ -83,7 +92,7 @@
 
 \begin{center}
 Der Text \aa Die Heidin\ae{} in diesem Buch folgt
-grundsätzlich zeichengetreu der Ausgabe: \mbox{Max Mohr.} \mbox{Die Heidin.}
+grundsätzlich zeichengetreu der Ausgabe\dopp{} \mbox{Max Mohr.} \mbox{Die Heidin.}
 \mbox{München, Verlag Georg Müller. 1929.}
 Abweichungen sind im Anhang vermerkt.
 \end{center}
