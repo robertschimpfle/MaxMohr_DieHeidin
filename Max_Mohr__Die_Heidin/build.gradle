@@ -43,10 +43,26 @@ task checkTexFiles() {
 	inputs.files inputFiles
 	
 	doLast {
-		inputFiles.each { logger.warn("Warning: file too blubb") }
+		inputFiles.each {
+			String fileContent = it.text
+			logger.info("Length of file ${it.name} = ${fileContent.length()}")
+			def lineCounter = 0
+			fileContent.eachLine {
+				lineCounter++
+				// Falsche Trenner am Zeilenende.
+				if (it =~ /\\-[ \t]*$/) {
+					logger.error("Error: Falscher Trennstrich am Zeilenende in Zeile ${lineCounter}: ${it}")
+				}
+			}
+//			def splits = fileContent =~ /\\\\-%/
+//			logger.info(splits.size().toString())
+//			splits.each { entry ->
+//				logger.info(entry)
+//			}
+		}
 	}
 }
 
 task pdf(dependsOn: latexThirdRun) {
-	doLast { println oink }
+	doLast { logger.info("PDF created.") }
 }
