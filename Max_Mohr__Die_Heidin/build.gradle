@@ -33,6 +33,11 @@ task latexSecondRun(type: Exec, dependsOn: latexFirstRun) {
 	workingDir buildSrcDir
 }
 
+task latexThirdRun(type: Exec, dependsOn: latexSecondRun) {
+	commandLine 'pdflatex', '-output-directory', '.', 'text.tex'
+	workingDir buildSrcDir
+}
+
 task checkTexFiles() {
 	def inputFiles  = files { fileTree(dir: srcDir, includes: ['*.tex']) }
 	inputs.files inputFiles
@@ -42,6 +47,6 @@ task checkTexFiles() {
 	}
 }
 
-task pdf(dependsOn: latexSecondRun) {
+task pdf(dependsOn: latexThirdRun) {
 	doLast { println oink }
 }
