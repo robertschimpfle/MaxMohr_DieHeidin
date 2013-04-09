@@ -26,11 +26,27 @@ task replaceVersionInfo(type: Copy, dependsOn: clean) {
 task latexFirstRun(type: Exec, dependsOn: replaceVersionInfo) {
 	commandLine 'pdflatex', '-output-directory', '.', 'text.tex'
 	workingDir buildSrcDir
+	ignoreExitValue true
+	standardOutput = new ByteArrayOutputStream()
+	doLast {
+		if (execResult.getExitValue() != 0) {
+			println standardOutput.toString()
+			throw execResult.rethrowFailure()
+		}
+	}
 }
 
 task latexSecondRun(type: Exec, dependsOn: latexFirstRun) {
 	commandLine 'pdflatex', '-output-directory', '.', 'text.tex'
 	workingDir buildSrcDir
+	ignoreExitValue true
+	standardOutput = new ByteArrayOutputStream()
+	doLast {
+		if (execResult.getExitValue() != 0) {
+			println standardOutput.toString()
+			throw execResult.rethrowFailure()
+		}
+	}
 }
 
 task latexThirdRun(type: Exec, dependsOn: latexSecondRun) {
