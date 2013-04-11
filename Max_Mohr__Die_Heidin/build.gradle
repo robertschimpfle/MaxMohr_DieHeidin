@@ -3,6 +3,9 @@ import java.text.SimpleDateFormat
 def srcDir = 'src/main/latex'
 def buildSrcDir = 'build'
 
+// Buchstaben.
+def b = 'a-zA-ZÄÖÜäöüß'
+
 task prepare(type: Exec) {
 	commandLine 'mkdir', '-p', 'build'
 }
@@ -57,20 +60,22 @@ task latexThirdRun(type: Exec, dependsOn: latexSecondRun) {
 task checkTexFiles() {
 	def inputFiles  = files { fileTree(dir: srcDir, includes: ['*.tex']) }
 	inputs.files inputFiles
-	println ""
 	doLast {
+		println ""
 		inputFiles.each { datei ->
 			String fileContent = datei.text
 			logger.info("Length of file ${datei.name} = ${fileContent.length()}")
 			def lineCounter = 0
 			fileContent.eachLine {
 				lineCounter++
+				// Mehrfache Leerzeichen.
+				
 				// Falsche Trenner.
-				if (it =~ /[^a-zA-ZÄÖÜäöüß]\\-[^a-zA-ZÄÖÜäöüß]/) {
+				if (it =~ /[^${b}]\\-[^${b}]/) {
 					logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich in \"${it}\"")
 				}
 				// Falsche Trenner am Zeilenende.
-				if ((it =~ /\\-[^a-zA-ZÄÖÜäöüß]%.*$/) || (it =~ /\\-%.+$/)) {
+				if ((it =~ /\\-[^${b}]%.*$/) || (it =~ /\\-%.+$/)) {
 					logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich am Zeilenende: \"${it}\"")
 				}
 			}
@@ -85,7 +90,6 @@ task listLigations() {
 	doLast {
 		def ligaturen = ['f', 't']
 		def liste = []
-		def b = 'a-zA-ZÄÖÜäöüß'
 		inputFiles.each {
 			String fileContent = it.text
 
@@ -93,7 +97,7 @@ task listLigations() {
 				def matcher =
 					fileContent =~
 						/(([${b}]|(\\-[${b}]))+(\\-%\n){0,1}){0,1}([${b}]|(\\-[${b}]))+(${it}(\\-){0,1}${it})([${b}]|(\\-[${b}]))*((\\-%\n){0,1}([${b}]|(\\-[${b}]))+){0,1}/
-					matcher.each {
+				matcher.each {
 					String wort = it[0].replaceAll('\\\\-', '').replaceAll('%', '').replaceAll('\n', '')
 					if (! liste.contains(wort)) { liste.add(wort) }
 				}
