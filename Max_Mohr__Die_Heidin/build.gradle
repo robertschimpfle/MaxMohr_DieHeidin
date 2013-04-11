@@ -57,8 +57,8 @@ task latexThirdRun(type: Exec, dependsOn: latexSecondRun) {
 task checkTexFiles() {
 	def inputFiles  = files { fileTree(dir: srcDir, includes: ['*.tex']) }
 	inputs.files inputFiles
-	println ""
 	doLast {
+		println ""
 		inputFiles.each { datei ->
 			String fileContent = datei.text
 			logger.info("Length of file ${datei.name} = ${fileContent.length()}")
@@ -85,20 +85,23 @@ task listLigations() {
 	doLast {
 		def ligaturen = ['f', 't']
 		def liste = []
+		def b = 'a-zA-ZÄÖÜäöüß'
 		inputFiles.each {
 			String fileContent = it.text
 
 			ligaturen.each {
 				def matcher =
-					fileContent =~ /[a-zA-ZÄÖÜäöüß]+[a-zäöüß]*(${it}(\\-){0,1}${it})([a-zäöüß]|(\\-[a-zA-ZÄÖÜäöüß]))*((\\-%\n){0,1}([a-zäöüß]|(\\-[a-zA-ZÄÖÜäöüß]))+){0,1}/
+					fileContent =~
+						/(([${b}]|(\\-[${b}]))+(\\-%\n){0,1}){0,1}([${b}]|(\\-[${b}]))+(${it}(\\-){0,1}${it})([${b}]|(\\-[${b}]))*((\\-%\n){0,1}([${b}]|(\\-[${b}]))+){0,1}/
 				matcher.each {
 					String wort = it[0].replaceAll('\\\\-', '').replaceAll('%', '').replaceAll('\n', '')
 					if (! liste.contains(wort)) { liste.add(wort) }
 				}
 			}
 		}
-		println "Im Text gefundene Ligaturwörter mit den Doppelbuchstaben von ${ligaturen}"
-		liste.sort{a, b -> a.compareToIgnoreCase b}.each {println it}
+		println "Im Text gefundene Ligaturwörter mit den Doppelbuchstaben von ${ligaturen}:\n"
+		liste.sort{x, y -> x.compareToIgnoreCase y}.each {println it}
+		println "\n${liste.size} Wörter"
 	}
 }
 
