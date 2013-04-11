@@ -93,6 +93,9 @@ task checkTexFiles() {
 				if ((it =~ /\\-[^${b}]%.*$/) || (it =~ /\\-%.+$/)) {
 					logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich am Zeilenende: \"${it}\"")
 				}
+//				if (it =~ /[^%]- *$/) {
+//					logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich am Zeilenende: \"${it}\"")
+//				}
 			}
 		}
 	}
