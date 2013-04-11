@@ -57,7 +57,7 @@ task latexThirdRun(type: Exec, dependsOn: latexSecondRun) {
 task checkTexFiles() {
 	def inputFiles  = files { fileTree(dir: srcDir, includes: ['*.tex']) }
 	inputs.files inputFiles
-	
+	println ""
 	doLast {
 		inputFiles.each { datei ->
 			String fileContent = datei.text

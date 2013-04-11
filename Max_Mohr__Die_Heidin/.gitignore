@@ -2,4 +2,8 @@
 /build
 /text.ent
 *.ent
+/.settings
+/.gradle
+/.tex
 .settings
+*.prefs
