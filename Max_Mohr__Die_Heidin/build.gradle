@@ -57,6 +57,7 @@ task latexThirdRun(type: Exec, dependsOn: latexSecondRun) {
 	workingDir buildSrcDir
 }
 
+// Prüfe Vorgaben zur Texteingabe.
 task checkTexFiles() {
 	def inputFiles  = files { fileTree(dir: srcDir, includes: ['*.tex']) }
 	inputs.files inputFiles
