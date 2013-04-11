@@ -69,10 +69,24 @@ task checkTexFiles() {
 			fileContent.eachLine {
 				lineCounter++
 				// Mehrfache Leerzeichen.
-				
+				if (it =~ / +\n* +/) {
+					logger.error("Error: ${datei.name}:${lineCounter}, Mehrfache Leerzeichen: \"${it}\"")
+				}
+				// Leerzeichen am Zeilenanfang.
+				if (it =~ /^ /) {
+					logger.error("Error: ${datei.name}:${lineCounter}, Leerzeichen am Zeilenanfang: \"${it}\"")
+				}
+				// Leerzeichen am Zeilenende.
+				if (it =~ /.+ $/) {
+					logger.error("Error: ${datei.name}:${lineCounter}, Leerzeichen am Zeilenende: \"${it}\"")
+				}
+				// Tabulatorzeichen im Text.
+				if (it =~ /\t/) {
+					logger.error("Error: ${datei.name}:${lineCounter}, Tabulatorzeichen im Text: \"${it}\"")
+				}
 				// Falsche Trenner.
 				if (it =~ /[^${b}]\\-[^${b}]/) {
-					logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich in \"${it}\"")
+					logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich: \"${it}\"")
 				}
 				// Falsche Trenner am Zeilenende.
 				if ((it =~ /\\-[^${b}]%.*$/) || (it =~ /\\-%.+$/)) {
@@ -83,6 +97,11 @@ task checkTexFiles() {
 	}
 }
 
+// Wörter finden, die die Ligatur enthalten und
+// in der vorherigen Zeile begonnen haben können
+// bzw. in der nächsten Zeile enden können.
+// Zusammengesetzte Wörter mit "-" ebenfalls
+// berücksichtigen.
 task listLigations() {
 	def inputFiles  = files { fileTree(dir: srcDir, includes: ['*.tex']) }
 	inputs.files inputFiles
@@ -94,9 +113,18 @@ task listLigations() {
 			String fileContent = it.text
 
 			ligaturen.each {
+				def ligatur = "(${it}(\\-){0,1}${it})"
+				def restSelbeZeile = "([${b}]|(\\-[${b}]))*"
+				def trennerZeilenende = "(\\-%\n){0,1}"
+				def restVorhZeile =
+					"(${restSelbeZeile}${trennerZeilenende}){0,1}"
+				def restNächsteZeile =
+					"(${trennerZeilenende}${restSelbeZeile}){0,1}"
+				
 				def matcher =
 					fileContent =~
-						/(([${b}]|(\\-[${b}]))+(\\-%\n){0,1}){0,1}([${b}]|(\\-[${b}]))+(${it}(\\-){0,1}${it})([${b}]|(\\-[${b}]))*((\\-%\n){0,1}([${b}]|(\\-[${b}]))+){0,1}/
+						/${restVorhZeile}${restSelbeZeile}${ligatur}${restSelbeZeile}${restNächsteZeile}/
+
 				matcher.each {
 					String wort = it[0].replaceAll('\\\\-', '').replaceAll('%', '').replaceAll('\n', '')
 					if (! liste.contains(wort)) { liste.add(wort) }
