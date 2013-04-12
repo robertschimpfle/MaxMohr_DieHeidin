@@ -1,5 +1,7 @@
 import java.text.SimpleDateFormat
 
+apply plugin: "sonar"
+
 def srcDir = 'src/main/latex'
 def buildSrcDir = 'build'
 
@@ -93,8 +95,8 @@ task checkTexFiles(dependsOn: replaceVersionInfo) {
 				if ((it =~ /\\-[^${b}]%.*$/) || (it =~ /\\-%.+$/)) {
 					logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich am Zeilenende: \"${it}\"")
 				}
-				// Falscher Trenner am Zeilenende wenn nicht mit % abgeschlossen ist.
-				if (it =~ /^([^%]|\\%)+[\\]{0,1}-[ ]*$/) {
+				// Falscher Trenner am Zeilenende wenn nicht mit % abgeschlossen ist. Kommentarzeilen ignorieren.
+				if (it =~ /^([^%]|\\%)*[^-%]+[\\]{0,1}-[ \t]*$/) {
 					logger.error("Error: ${datei.name}:${lineCounter}, falscher Trennstrich am Zeilenende: \"${it}\"")
 				}
 			}
