@@ -58,7 +58,7 @@ task latexThirdRun(type: Exec, dependsOn: latexSecondRun) {
 }
 
 // Prüfe Vorgaben zur Texteingabe.
-task checkTexFiles() {
+task checkTexFiles(dependsOn: replaceVersionInfo) {
 	def inputFiles  = files { fileTree(dir: srcDir, includes: ['*.tex']) }
 	inputs.files inputFiles
 	doLast {
@@ -71,7 +71,7 @@ task checkTexFiles() {
 				lineCounter++
 				// Mehrfache Leerzeichen.
 				if (it =~ / +\n* +/) {
-					logger.error("Error: ${datei.name}:${lineCounter}, Mehrfache Leerzeichen: \"${it}\"")
+					logger.error("Error: ${datei.name}:${lineCounter}, mehrfache Leerzeichen: \"${it}\"")
 				}
 				// Leerzeichen am Zeilenanfang.
 				if (it =~ /^ /) {
@@ -85,17 +85,18 @@ task checkTexFiles() {
 				if (it =~ /\t/) {
 					logger.error("Error: ${datei.name}:${lineCounter}, Tabulatorzeichen im Text: \"${it}\"")
 				}
-				// Falsche Trenner.
+				// Falscher Trenner.
 				if (it =~ /[^${b}]\\-[^${b}]/) {
 					logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich: \"${it}\"")
 				}
-				// Falsche Trenner am Zeilenende.
+				// Falscher Trenner am Zeilenende wenn mit % abgeschlossen ist.
 				if ((it =~ /\\-[^${b}]%.*$/) || (it =~ /\\-%.+$/)) {
 					logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich am Zeilenende: \"${it}\"")
 				}
-//				if (it =~ /[^%]- *$/) {
-//					logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich am Zeilenende: \"${it}\"")
-//				}
+				// Falscher Trenner am Zeilenende wenn nicht mit % abgeschlossen ist.
+				if (it =~ /^([^%]|\\%)+[\\]{0,1}-[ ]*$/) {
+					logger.error("Error: ${datei.name}:${lineCounter}, falscher Trennstrich am Zeilenende: \"${it}\"")
+				}
 			}
 		}
 	}
