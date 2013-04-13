@@ -10,6 +10,10 @@
 
 \usepackage[paperwidth=135mm,paperheight=215mm]{geometry}
 
+\usepackage[activate={true,nocompatibility},final,protrusion=true,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+
+%\usepackage{hfoldsty}
+
 %\linespread{1.00}
 
 \typearea[5mm]{11}
@@ -37,7 +41,8 @@
 \def\makeenmark{}
 
 % Abstand zwischen Absätzen.
-\def\abstand{\\\parbox[t][1ex]{1cm}{}\\}
+%\def\abstand{\\\parbox[t][3ex]{1cm}{}\\}
+\def\abstand{\\\\\\}
 
 % Eingriff in Text der Vorlage.
 \def\eingriff#1{\linelabel{\theenmark}\endnote{\makebox[0em][r]
