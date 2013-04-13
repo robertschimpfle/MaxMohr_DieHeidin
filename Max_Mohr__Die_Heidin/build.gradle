@@ -1,5 +1,7 @@
 import java.text.SimpleDateFormat
 
+apply plugin: "sonar"
+
 def srcDir = 'src/main/latex'
 def buildSrcDir = 'build'
 
@@ -58,7 +60,7 @@ task latexThirdRun(type: Exec, dependsOn: latexSecondRun) {
 }
 
 // Prüfe Vorgaben zur Texteingabe.
-task checkTexFiles() {
+task checkTexFiles(dependsOn: replaceVersionInfo) {
 	def inputFiles  = files { fileTree(dir: srcDir, includes: ['*.tex']) }
 	inputs.files inputFiles
 	doLast {
@@ -71,7 +73,7 @@ task checkTexFiles() {
 				lineCounter++
 				// Mehrfache Leerzeichen.
 				if (it =~ / +\n* +/) {
-					logger.error("Error: ${datei.name}:${lineCounter}, Mehrfache Leerzeichen: \"${it}\"")
+					logger.error("Error: ${datei.name}:${lineCounter}, mehrfache Leerzeichen: \"${it}\"")
 				}
 				// Leerzeichen am Zeilenanfang.
 				if (it =~ /^ /) {
@@ -85,17 +87,18 @@ task checkTexFiles() {
 				if (it =~ /\t/) {
 					logger.error("Error: ${datei.name}:${lineCounter}, Tabulatorzeichen im Text: \"${it}\"")
 				}
-				// Falsche Trenner.
+				// Falscher Trenner.
 				if (it =~ /[^${b}]\\-[^${b}]/) {
 					logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich: \"${it}\"")
 				}
-				// Falsche Trenner am Zeilenende.
+				// Falscher Trenner am Zeilenende wenn mit % abgeschlossen ist.
 				if ((it =~ /\\-[^${b}]%.*$/) || (it =~ /\\-%.+$/)) {
 					logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich am Zeilenende: \"${it}\"")
 				}
-//				if (it =~ /[^%]- *$/) {
-//					logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich am Zeilenende: \"${it}\"")
-//				}
+				// Falscher Trenner am Zeilenende wenn nicht mit % abgeschlossen ist. Kommentarzeilen ignorieren.
+				if (it =~ /^([^%]|\\%)*[^-%]+[\\]{0,1}-[ \t]*$/) {
+					logger.error("Error: ${datei.name}:${lineCounter}, falscher Trennstrich am Zeilenende: \"${it}\"")
+				}
 			}
 		}
 	}
@@ -111,23 +114,25 @@ task listLigations() {
 	inputs.files inputFiles
 
 	doLast {
-		def ligaturen = ['f', 't']
+		def ligaturen = [['f', 'f'], ['t', 't'], ['f', 'l']]
 		def liste = []
 		inputFiles.each {
 			String fileContent = it.text
 
 			ligaturen.each {
-				def ligatur = "(${it}(\\-){0,1}${it})"
-				def restSelbeZeile = "([${b}]|(\\-[${b}]))*"
-				def trennerZeilenende = "(\\-%\n){0,1}"
-				def restVorhZeile =
-					"(${restSelbeZeile}${trennerZeilenende}){0,1}"
-				def restNächsteZeile =
-					"(${trennerZeilenende}${restSelbeZeile}){0,1}"
+				def ligatur = "${it[0]}(\\-){0,1}${it[1]}"
+				def restZeile = "([${b}]|(\\-[${b}]))"
+				def restZeile0 = "${restZeile}*"
+				def restZeile1 = "${restZeile}+"
+				def trennerZeilenende = "\\-%\n"
+				def vorherigeZeile =
+					"(${restZeile1}${trennerZeilenende}){0,1}"
+				def nächsteZeile =
+					"(${trennerZeilenende}${restZeile1}){0,1}"
 				
 				def matcher =
 					fileContent =~
-						/${restVorhZeile}${restSelbeZeile}${ligatur}${restSelbeZeile}${restNächsteZeile}/
+						/${vorherigeZeile}${restZeile0}${ligatur}${restZeile0}${nächsteZeile}/
 
 				matcher.each {
 					String wort = it[0].replaceAll('\\\\-', '').replaceAll('%', '').replaceAll('\n', '')
