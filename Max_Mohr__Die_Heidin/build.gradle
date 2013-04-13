@@ -114,23 +114,25 @@ task listLigations() {
 	inputs.files inputFiles
 
 	doLast {
-		def ligaturen = ['f', 't']
+		def ligaturen = [['f', 'f'], ['t', 't'], ['f', 'l']]
 		def liste = []
 		inputFiles.each {
 			String fileContent = it.text
 
 			ligaturen.each {
-				def ligatur = "(${it}(\\-){0,1}${it})"
-				def restSelbeZeile = "([${b}]|(\\-[${b}]))*"
-				def trennerZeilenende = "(\\-%\n){0,1}"
-				def restVorhZeile =
-					"(${restSelbeZeile}${trennerZeilenende}){0,1}"
-				def restNächsteZeile =
-					"(${trennerZeilenende}${restSelbeZeile}){0,1}"
+				def ligatur = "${it[0]}(\\-){0,1}${it[1]}"
+				def restZeile = "([${b}]|(\\-[${b}]))"
+				def restZeile0 = "${restZeile}*"
+				def restZeile1 = "${restZeile}+"
+				def trennerZeilenende = "\\-%\n"
+				def vorherigeZeile =
+					"(${restZeile1}${trennerZeilenende}){0,1}"
+				def nächsteZeile =
+					"(${trennerZeilenende}${restZeile1}){0,1}"
 				
 				def matcher =
 					fileContent =~
-						/${restVorhZeile}${restSelbeZeile}${ligatur}${restSelbeZeile}${restNächsteZeile}/
+						/${vorherigeZeile}${restZeile0}${ligatur}${restZeile0}${nächsteZeile}/
 
 				matcher.each {
 					String wort = it[0].replaceAll('\\\\-', '').replaceAll('%', '').replaceAll('\n', '')
