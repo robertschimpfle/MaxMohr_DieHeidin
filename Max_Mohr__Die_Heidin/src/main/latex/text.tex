@@ -12,8 +12,6 @@
 
 \usepackage[activate={true,nocompatibility},final,protrusion=true,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
 
-%\usepackage{hfoldsty}
-
 %\linespread{1.00}
 
 \typearea[5mm]{11}
@@ -25,8 +23,6 @@
 \usepackage[pagewise]{lineno}
 
 \usepackage{lipsum}
-
-%\usepackage{poemscol}
 
 \begin{document}
 
@@ -52,9 +48,8 @@
 
 % Kapitelüberschrift.
 \def\kapitel#1{
-%\cleardoublepage
+\clearpage
 \parbox[c][6ex]{1cm}{}\addsec{#1}}
-% Hier noch 
 
 % Fremdsprachliche Textstellen.
 \def\fremdsprachlich#1{\textit{#1}}
@@ -73,7 +68,6 @@
 \def\ae{\kern .05em\frqq}
 
 % Doppelpunkt.
-%\def\dopp{\thinspace{\kern .08em} :}
 \def\dopp{\kern .03em :}
 
 % Semikolon.
