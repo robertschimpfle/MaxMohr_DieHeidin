@@ -49,10 +49,7 @@
 % Kapitelüberschrift.
 \def\kapitel#1{
 \clearpage
-\parbox[c][4ex]{1cm}{}
-\addsec{#1}
-\parbox[c][1ex]{1cm}{}
-}
+\parbox[c][6ex]{1cm}{}\addsec{#1}}
 
 % Fremdsprachliche Textstellen.
 \def\fremdsprachlich#1{\textit{#1}}
@@ -84,7 +81,6 @@
 
 \def\punkte{\kern .08em \ldots}
 
-
 % ***************** Definitionen, Makros Ende ******************
 % --------------------------------------------------------------
 
@@ -97,8 +93,6 @@
 \author{Max Mohr}
 \title{Die Heidin}
 \date{}
-
-
 \lowertitleback{
 
 \begin{center}
@@ -143,11 +137,13 @@ Dieses Buch wurde erstellt mit \LaTeX und \KOMAScript.
 \include{kapitel_1_3}
 
 \addchap{Zweiter Teil}
+\cleardoublepage
 \include{kapitel_2_1}
 \include{kapitel_2_2}
 \include{kapitel_2_3}
 
 \addchap{Dritter Teil}
+\cleardoublepage
 \include{kapitel_3_1}
 \include{kapitel_3_2}
 \include{kapitel_3_3}
