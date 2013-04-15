@@ -52,8 +52,9 @@
 
 % Kapitelüberschrift.
 \def\kapitel#1{
-\cleardoublepage
+%\cleardoublepage
 \parbox[c][6ex]{1cm}{}\addsec{#1}}
+% Hier noch 
 
 % Fremdsprachliche Textstellen.
 \def\fremdsprachlich#1{\textit{#1}}
@@ -136,19 +137,19 @@ Dieses Buch wurde erstellt mit \LaTeX und \KOMAScript.
 \modulolinenumbers[5] % Zum Ausblenden z. B. Wert 100 einsetzen.
 
 \addchap{Erster Teil}
-\include{1_1._kapitel}
-\include{1_2._kapitel}
-\include{1_3._kapitel}
+\include{kapitel_1_1}
+\include{kapitel_1_2}
+\include{kapitel_1_3}
 
 \addchap{Zweiter Teil}
-\include{2_1._kapitel}
-\include{2_2._kapitel}
-\include{2_3._kapitel}
+\include{kapitel_2_1}
+\include{kapitel_2_2}
+\include{kapitel_2_3}
 
 \addchap{Dritter Teil}
-\include{3_1._kapitel}
-\include{3_2._kapitel}
-\include{3_3._kapitel}
+\include{kapitel_3_1}
+\include{kapitel_3_2}
+\include{kapitel_3_3}
 
 % Ab hier Zeilennummern wieder aus.
 \endlinenumbers
