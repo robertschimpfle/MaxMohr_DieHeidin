@@ -10,13 +10,9 @@
 
 \usepackage[paperwidth=135mm,paperheight=215mm]{geometry}
 
-\usepackage[activate={true,nocompatibility},final,protrusion=true,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+\usepackage[activate={true,nocompatibility},final,tracking,kerning,spacing,stretch=20,shrink=20]{microtype}
 
-%\usepackage{hfoldsty}
-
-%\linespread{1.00}
-
-\typearea[5mm]{11}
+\typearea[3mm]{11}
 
 \usepackage{lmodern}
 
@@ -26,7 +22,7 @@
 
 \usepackage{lipsum}
 
-%\usepackage{poemscol}
+\usepackage{titlesec}
 
 \begin{document}
 
@@ -52,9 +48,11 @@
 
 % Kapitelüberschrift.
 \def\kapitel#1{
-%\cleardoublepage
-\parbox[c][6ex]{1cm}{}\addsec{#1}}
-% Hier noch 
+\clearpage
+\parbox[c][4ex]{1cm}{}
+\addsec{#1}
+\parbox[c][1ex]{1cm}{}
+}
 
 % Fremdsprachliche Textstellen.
 \def\fremdsprachlich#1{\textit{#1}}
@@ -73,7 +71,6 @@
 \def\ae{\kern .05em\frqq}
 
 % Doppelpunkt.
-%\def\dopp{\thinspace{\kern .08em} :}
 \def\dopp{\kern .03em :}
 
 % Semikolon.
@@ -87,6 +84,7 @@
 
 \def\punkte{\kern .08em \ldots}
 
+
 % ***************** Definitionen, Makros Ende ******************
 % --------------------------------------------------------------
 
@@ -99,6 +97,8 @@
 \author{Max Mohr}
 \title{Die Heidin}
 \date{}
+
+
 \lowertitleback{
 
 \begin{center}
@@ -137,6 +137,7 @@ Dieses Buch wurde erstellt mit \LaTeX und \KOMAScript.
 \modulolinenumbers[5] % Zum Ausblenden z. B. Wert 100 einsetzen.
 
 \addchap{Erster Teil}
+\cleardoublepage
 \include{kapitel_1_1}
 \include{kapitel_1_2}
 \include{kapitel_1_3}
