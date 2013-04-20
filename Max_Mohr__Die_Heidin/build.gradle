@@ -149,3 +149,37 @@ task listLigations() {
 task pdf(dependsOn: latexThirdRun) {
 	doLast { logger.info("PDF created.") }
 }
+
+task cpdCheck( ) {
+	doLast {
+		ant.taskdef(name: 'cpd', classname: 'net.sourceforge.pmd.cpd.CPDTask') {
+			classpath {
+				fileset(dir: 'lib', includes: 'pmd*.jar')
+			}
+		}
+		
+		ant.cpd(minimumTokenCount: 5, outputFile: 'cpd.txt', encoding: 'UTF-8', language: 'ruby') {
+			fileset(dir: srcDir) {
+				include(name: '**/*.tex')
+			}
+		}
+	}
+}
+
+//task simianCheck(dependsOn: latexThirdRun) {
+//	def inputFiles  = files { fileTree(dir: srcDir, includes: ['*.tex']) }
+//	doLast {
+//		ant.taskdef(resource: 'simiantask.properties') {
+//			classpath {
+//				fileset(dir: 'lib', includes: 'simian*.jar')
+//			}
+//		}
+//		ant.simian(language: 'text', threshold: 2, reportDuplicateText: true) {
+//			//inputFiles
+//			formatter(type: 'xml', toFile: 'simian-log.xml')
+//			fileset(dir: srcDir)
+//		}
+//	}
+//}
+
+// cat /home/robert/git/Die_Heidin/Max_Mohr__Die_Heidin/src/main/latex/kapitel_1_1.tex | sed ':a;N;$!ba;s/\\-%\n\([a-z]*[\.,;:]* *\)/\1\n/g' | detex -
