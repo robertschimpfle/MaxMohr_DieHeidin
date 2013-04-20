@@ -71,6 +71,10 @@ task checkTexFiles(dependsOn: replaceVersionInfo) {
 			def lineCounter = 0
 			fileContent.eachLine {
 				lineCounter++
+				
+				// Makros die nicht mit { enden.
+				if (it =~ /\\[a-zA-Z]+[^{]+/) {
+				}
 				// Mehrfache Leerzeichen.
 				if (it =~ / +\n* +/) {
 					logger.error("Error: ${datei.name}:${lineCounter}, mehrfache Leerzeichen: \"${it}\"")
