@@ -1,3 +1,4 @@
+%%SuppressWarnings("InputStyle")
 \documentclass[fontsize=11pt,headings=small]{scrbook}
 
 \setlength{\parskip}{0pt}
@@ -61,11 +62,11 @@
 \renewcommand*{\chapterpagestyle}{empty}
 
 % Anführungszeichen links.
-\def\aa{\flqq\kern .05em}
-\def\aanah{\flqq}
+\def\aa{\flqq{}\kern .05em}
+\def\aanah{\flqq{}}
 
 % Anführungszeichen rechts.
-\def\ae{\kern .05em\frqq}
+\def\ae{\kern .05em\frqq{}}
 
 % Doppelpunkt.
 \def\dopp{\kern .03em :}
@@ -79,7 +80,7 @@
 % Ausrufezeichen.
 \def\ausr{\kern .05em !}
 
-\def\punkte{\kern .08em \ldots}
+\def\punkte{\kern .08em \ldots{}}
 
 % ***************** Definitionen, Makros Ende ******************
 % --------------------------------------------------------------
@@ -108,7 +109,7 @@ Abweichungen sind im Anhang vermerkt.
 \end{center}
 
 \begin{center}
-Dieses Buch wurde erstellt mit \LaTeX und \KOMAScript.
+Dieses Buch wurde erstellt mit \LaTeX{} und \KOMAScript{}.
 \end{center}
 }
 
@@ -163,7 +164,7 @@ Dieses Buch wurde erstellt mit \LaTeX und \KOMAScript.
 \addpart{Anhang}
 
 \addsec{Eingriffe in den Text}
-\def\enotesize{\normalsize}
+\def\enotesize{\normalsize{}}
 \theendnotes
 
 \tableofcontents

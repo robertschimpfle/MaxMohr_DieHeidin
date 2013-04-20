@@ -6,7 +6,7 @@ def srcDir = 'src/main/latex'
 def buildSrcDir = 'build'
 
 // Buchstaben.
-def b = 'a-zA-ZÄÖÜäöüß'
+def b = 'a-zA-ZÄÖÜäöüßçéèáà'
 
 task prepare(type: Exec) {
 	commandLine 'mkdir', '-p', 'build'
@@ -69,42 +69,49 @@ task checkTexFiles(dependsOn: replaceVersionInfo) {
 			String fileContent = datei.text
 			logger.info("Length of file ${datei.name} = ${fileContent.length()}")
 			def lineCounter = 0
-			fileContent.eachLine {
-				lineCounter++
+			try {
+				fileContent.eachLine {
+					lineCounter++
 				
-				// Makros die nicht mit { enden.
-				if (it =~ /\\[a-zA-Z]+[^{]+/) {
-					logger.error("Error: ${datei.name}:${lineCounter}, Makro nicht mit { terminiert: \"${it}\"")
-				}
-				// Mehrfache Leerzeichen.
-				if (it =~ / +\n* +/) {
-					logger.error("Error: ${datei.name}:${lineCounter}, mehrfache Leerzeichen: \"${it}\"")
-				}
-				// Leerzeichen am Zeilenanfang.
-				if (it =~ /^ /) {
-					logger.error("Error: ${datei.name}:${lineCounter}, Leerzeichen am Zeilenanfang: \"${it}\"")
-				}
-				// Leerzeichen am Zeilenende.
-				if (it =~ /.+ $/) {
-					logger.error("Error: ${datei.name}:${lineCounter}, Leerzeichen am Zeilenende: \"${it}\"")
-				}
-				// Tabulatorzeichen im Text.
-				if (it =~ /\t/) {
-					logger.error("Error: ${datei.name}:${lineCounter}, Tabulatorzeichen im Text: \"${it}\"")
-				}
-				// Falscher Trenner.
-				if (it =~ /[^${b}]\\-[^${b}]/) {
-					logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich: \"${it}\"")
-				}
-				// Falscher Trenner am Zeilenende wenn mit % abgeschlossen ist.
-				if ((it =~ /\\-[^${b}]%.*$/) || (it =~ /\\-%.+$/)) {
-					logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich am Zeilenende: \"${it}\"")
-				}
-				// Falscher Trenner am Zeilenende wenn nicht mit % abgeschlossen ist. Kommentarzeilen ignorieren.
-				if (it =~ /^([^%]|\\%)*[^-%]+[\\]{0,1}-[ \t]*$/) {
-					logger.error("Error: ${datei.name}:${lineCounter}, falscher Trennstrich am Zeilenende: \"${it}\"")
+					// Aussteigen wenn Datei nicht geprüft werden soll.
+					if (it =~ /^[ \t]*%%SuppressWarnings\("InputStyle"\)/) {
+						throw new Exception("return from closure")
+					}
+					// Makros die nicht mit { enden.
+					if (it =~ /\\[a-zA-Z]+[ \\\t\n\.,;:-]{1,1}/) {
+						logger.error("Error: ${datei.name}:${lineCounter}, Makroname nicht mit { oder [ terminiert: \"${it}\"")
+					}
+					// Mehrfache Leerzeichen.
+					if (it =~ / {2}/) {
+						logger.error("Error: ${datei.name}:${lineCounter}, mehrfache Leerzeichen: \"${it}\"")
+					}
+					// Leerzeichen am Zeilenanfang.
+					if (it =~ /^ /) {
+						logger.error("Error: ${datei.name}:${lineCounter}, Leerzeichen am Zeilenanfang: \"${it}\"")
+					}
+					// Leerzeichen am Zeilenende.
+					if (it =~ /.+ $/) {
+						logger.error("Error: ${datei.name}:${lineCounter}, Leerzeichen am Zeilenende: \"${it}\"")
+					}
+					// Tabulatorzeichen im Text.
+					if (it =~ /\t/) {
+						logger.error("Error: ${datei.name}:${lineCounter}, Tabulatorzeichen im Text: \"${it}\"")
+					}
+					// Falscher Trenner.
+					if (it =~ /[^${b}]\\-[^${b}]/) {
+						logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich: \"${it}\"")
+					}
+					// Falscher Trenner am Zeilenende wenn mit % abgeschlossen ist.
+					if ((it =~ /\\-[^${b}]%.*$/) || (it =~ /\\-%.+$/)) {
+						logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich am Zeilenende: \"${it}\"")
+					}
+					// Falscher Trenner am Zeilenende wenn nicht mit % abgeschlossen ist. Kommentarzeilen ignorieren.
+					if (it =~ /^([^%]|\\%)*[^-%]+[\\]{0,1}-[ \t]*$/) {
+						logger.error("Error: ${datei.name}:${lineCounter}, falscher Trennstrich am Zeilenende: \"${it}\"")
+					}
 				}
 			}
+			catch (Exception e) {}
 		}
 	}
 }
