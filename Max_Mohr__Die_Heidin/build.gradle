@@ -181,28 +181,17 @@ task cpdCheck(type: JavaExec, dependsOn: stripLatexMarkup) {
 	main 'net.sourceforge.pmd.cpd.CPD'
 	classpath fileTree(dir: file('lib'), include: 'pmd*.jar')
 	args = [
-		'--minimum-tokens', '5',
+		'--minimum-tokens', minimumDuplicateTokens,
 		'--format', 'xml',
 		'--encoding', 'UTF-8',
 		'--language', 'latex',
 		'--files', file('build')
 	]
+	standardOutput = new ByteArrayOutputStream()
+	ignoreExitValue true
+	doLast {
+		file('build/cpd.xml').write(standardOutput.toString())
+	}
 }
-
-//task simianCheck(dependsOn: latexThirdRun) {
-//	def inputFiles  = files { fileTree(dir: srcDir, includes: ['*.tex']) }
-//	doLast {
-//		ant.taskdef(resource: 'simiantask.properties') {
-//			classpath {
-//				fileset(dir: 'lib', includes: 'simian*.jar')
-//			}
-//		}
-//		ant.simian(language: 'text', threshold: 2, reportDuplicateText: true) {
-//			//inputFiles
-//			formatter(type: 'xml', toFile: 'simian-log.xml')
-//			fileset(dir: srcDir)
-//		}
-//	}
-//}
 
 // cat /home/robert/git/Die_Heidin/Max_Mohr__Die_Heidin/src/main/latex/kapitel_1_1.tex | sed ':a;N;$!ba;s/\\-%\n\([a-z]*[\.,;:]* *\)/\1\n/g' | detex -
