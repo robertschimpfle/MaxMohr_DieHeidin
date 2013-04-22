@@ -1,6 +1,6 @@
 %%SuppressWarnings("InputStyle")
 %%SuppressWarnings("ContentCheck")
-\documentclass[fontsize=11pt,headings=small]{scrbook}
+\documentclass[fontsize=10pt,headings=small]{scrbook}
 
 \setlength{\parskip}{0pt}
 
@@ -11,10 +11,13 @@
 \usepackage[german]{babel}
 
 \usepackage[paperwidth=135mm,paperheight=215mm]{geometry}
+%\usepackage[a4,frame,center]{crop}
 
 \usepackage[activate={true,nocompatibility},final,tracking,kerning,spacing,stretch=20,shrink=20]{microtype}
 
-\typearea[3mm]{11}
+\typearea[6mm]{10}
+
+\linespread{1.05}
 
 \usepackage{lmodern}
 
@@ -50,8 +53,11 @@
 
 % Kapitelüberschrift.
 \def\kapitel#1{
-\clearpage
-\parbox[c][6ex]{1cm}{}\addsec{#1}}
+%\clearpage
+%\parbox[c][4ex]{1cm}{}
+\addsec{#1}
+% Hier drunter stimmt die Registerhaltigkeit noch nicht.
+}
 
 % Fremdsprachliche Textstellen.
 \def\fremdsprachlich#1{\textit{#1}}
@@ -121,7 +127,6 @@ Dieses Buch wurde erstellt mit \LaTeX{} und \KOMAScript{}.
 
 
 
-
 % --------------------------------------------------------------
 % *********************** Roman Anfang *************************
 
@@ -130,7 +135,7 @@ Dieses Buch wurde erstellt mit \LaTeX{} und \KOMAScript{}.
 % Ab hier Zeilennummer pro Seite erfassen.
 \linenumbers
 \setpagewiselinenumbers
-\modulolinenumbers[5] % Zum Ausblenden z. B. Wert 100 einsetzen.
+\modulolinenumbers[100] % Zum Ausblenden z. B. Wert 100 einsetzen.
 
 \addchap{Erster Teil}
 \cleardoublepage
