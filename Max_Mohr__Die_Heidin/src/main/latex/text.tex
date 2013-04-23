@@ -1,6 +1,6 @@
 %%SuppressWarnings("InputStyle")
 %%SuppressWarnings("ContentCheck")
-\documentclass[fontsize=10pt,headings=small]{scrbook}
+\documentclass[fontsize=11pt,headings=small]{scrbook}
 
 \setlength{\parskip}{0pt}
 
@@ -15,9 +15,9 @@
 
 \usepackage[activate={true,nocompatibility},final,tracking,kerning,spacing,stretch=20,shrink=20]{microtype}
 
-\typearea[6mm]{10}
+\typearea[5mm]{11}
 
-\linespread{1.05}
+%\linespread{1.05}
 
 \usepackage{lmodern}
 
@@ -45,18 +45,23 @@
 
 % Abstand zwischen Absätzen.
 %\def\abstand{\\\parbox[t][3ex]{1cm}{}\\}
-\def\abstand{\\\\\\}
+%\def\abstand{\\\\\\}
+\def\abstand{\vspace{\baselineskip}\vspace{\baselineskip}}
 
 % Eingriff in Text der Vorlage.
-\def\eingriff#1{\linelabel{\theenmark}\endnote{\makebox[0em][r]
-{\pageref{\theenmark}}, \makebox[1em][r]{\ref{\theenmark}}\makebox[1em]{}#1}}
+%\newcommand{\eingriff}[2]{\linelabel{#1}\endnote{\makebox[0em][r]
+%{\pageref{#1}},
+%\makebox[1em][r]{\ref{#1}}\makebox[1em]{}#2}}
+
+\newcommand{\eingriff}[2]{\linelabel{#1}\endnotetext{\makebox[0em][r]
+{\pageref{#1}},
+\makebox[1em][r]{\ref{#1}}\makebox[1em]{}#2}}
 
 % Kapitelüberschrift.
 \def\kapitel#1{
-%\clearpage
-%\parbox[c][4ex]{1cm}{}
 \addsec{#1}
-% Hier drunter stimmt die Registerhaltigkeit noch nicht.
+\vspace{\baselineskip}
+% Hier drunter stimmt die Registerhaltigkeit nicht bei Schriftgröße 10.
 }
 
 % Fremdsprachliche Textstellen.
