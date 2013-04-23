@@ -34,8 +34,7 @@
 
 
 
-% --------------------------------------------------------------
-% **************** Definitionen, Makros Anfang *****************
+% ******************* Definitionen, Makros *********************
 
 % Keine Kopfzeile, aber Seitennummer.
 \pagestyle{plain}
@@ -96,51 +95,17 @@
 
 
 
-% ***************** Definitionen, Makros Ende ******************
-% --------------------------------------------------------------
+
+% ************************ Vorspann ****************************
+\include{titel}
 
 
 
 
-% --------------------------------------------------------------
-% ********************** Vorspann Anfang ***********************
-
-\author{Max Mohr}
-\title{Die Heidin}
-\date{}
-\lowertitleback{
-
-\begin{center}
-Der Text \aa{}Die Heidin\ae{} in diesem Buch folgt
-grundsätzlich zeichengetreu der Ausgabe\dopp{} \mbox{Max Mohr.} \mbox{Die Heidin.}
-\mbox{München, Verlag Georg Müller. 1929.}
-Abweichungen sind im Anhang vermerkt.
-\end{center}
-
-\begin{center}
-@version@\\
-@timestamp@
-\end{center}
-
-\begin{center}
-Dieses Buch wurde erstellt mit \LaTeX{} und \KOMAScript{}.
-\end{center}
-}
-
-\maketitle
-
-% *********************** Vorspann Ende ************************
-% --------------------------------------------------------------
-
-
-
-% --------------------------------------------------------------
-% *********************** Roman Anfang *************************
-
+% ************************** Roman *****************************
 \addpart{Die Heidin}
 
-% Ab hier Zeilennummer pro Seite erfassen.
-\linenumbers
+\linenumbers % Ab hier Zeilennummer pro Seite erfassen.
 \setpagewiselinenumbers
 \modulolinenumbers[100] % Zum Ausblenden z. B. Wert 100 einsetzen.
 
@@ -162,32 +127,26 @@ Dieses Buch wurde erstellt mit \LaTeX{} und \KOMAScript{}.
 \include{kapitel_3_2}
 \include{kapitel_3_3}
 
-% Ab hier Zeilennummern wieder aus.
-\endlinenumbers
-
-% ************************ Roman Ende **************************
-% --------------------------------------------------------------
+\endlinenumbers % Ab hier Zeilennummern wieder aus.
 
 
 
 
-% --------------------------------------------------------------
-% *********************** Anhang Anfang ************************
-
+% ************************* Anhang *****************************
 \addpart{Anhang}
 \cleardoublepage
-
 \begin{small}
-
 \include{anmerkungen}
 \include{zum_band}
-
 \end{small}
 
+
+
+
+% ******************** Inhaltsverzeichnis **********************
 \tableofcontents
 
-% ************************ Anhang Ende *************************
-% --------------------------------------------------------------
+
 
 
 \end{document}
