@@ -1,22 +1,19 @@
 import java.text.SimpleDateFormat
 
-apply plugin: "sonar"
+apply plugin: 'base'
 
-def srcDir = 'src/main/latex'
-def buildSrcDir = 'build'
+defaultTasks 'pdf'
+
+ext.srcDir = file 'src/main/latex'
+ext.buildSrcDir = file 'build/src/main/latex'
+ext.inputFile = 'text.tex'
+ext.pdfDir = file 'build/pdf'
 
 // Buchstaben.
 def b = 'a-zA-ZÄÖÜäöüßçéèáà'
 
-task prepare(type: Exec) {
-	commandLine 'mkdir', '-p', 'build'
-}
-
-task clean(type: Exec, dependsOn: prepare) {
-	commandLine 'rm', '-rf', 'build'
-}
-
-task replaceVersionInfo(type: Copy, dependsOn: clean) {
+task replaceVersionInfo(type: Copy) {
+	description = 'Replace the version information in the book.'
 	from srcDir
 	into buildSrcDir
 	include '**/*.tex'
@@ -28,12 +25,30 @@ task replaceVersionInfo(type: Copy, dependsOn: clean) {
 	}
 }
 
-task latexFirstRun(type: Exec, dependsOn: replaceVersionInfo) {
-	commandLine 'pdflatex', '-output-directory', '.', 'text.tex'
+task resources(dependsOn: replaceVersionInfo) {
+	outputs.file pdfDir
+	doLast {
+		pdfDir.mkdirs()
+	}
+}
+
+task latex(dependsOn: ['resources', 'replaceVersionInfo']) {
+	inputs.files replaceVersionInfo.outputs
+	outputs.file pdfDir
+	doLast {
+		latexFirstRun.execute()
+		latexSecondRun.execute()
+		latexThirdRun.execute()
+	}
+}
+
+task latexFirstRun(type: Exec) {
+	commandLine 'pdflatex', '-output-directory', pdfDir, inputFile
 	workingDir buildSrcDir
 	ignoreExitValue true
 	standardOutput = new ByteArrayOutputStream()
 	doLast {
+		logger.info 'LaTeX first run.'
 		if (execResult.getExitValue() != 0) {
 			println standardOutput.toString()
 			throw execResult.rethrowFailure()
@@ -42,11 +57,12 @@ task latexFirstRun(type: Exec, dependsOn: replaceVersionInfo) {
 }
 
 task latexSecondRun(type: Exec, dependsOn: latexFirstRun) {
-	commandLine 'pdflatex', '-output-directory', '.', 'text.tex'
+	commandLine 'pdflatex', '-output-directory', pdfDir, inputFile
 	workingDir buildSrcDir
 	ignoreExitValue true
 	standardOutput = new ByteArrayOutputStream()
 	doLast {
+		logger.info 'LaTeX second run.'
 		if (execResult.getExitValue() != 0) {
 			println standardOutput.toString()
 			throw execResult.rethrowFailure()
@@ -55,11 +71,15 @@ task latexSecondRun(type: Exec, dependsOn: latexFirstRun) {
 }
 
 task latexThirdRun(type: Exec, dependsOn: latexSecondRun) {
-	commandLine 'pdflatex', '-output-directory', '.', 'text.tex'
+	commandLine 'pdflatex', '-output-directory', pdfDir, inputFile
 	workingDir buildSrcDir
+	doLast {
+		logger.info 'LaTeX third run.'
+	}
 }
 
 task stripLatexMarkup(dependsOn: replaceVersionInfo) {
+	description = 'Convert all input LaTeX files to plain text files.'
 	fileTree(dir: file('build'), include: '*.tex').each { file ->
 		if (! file.text.contains('%%SuppressWarnings("ContentCheck")')) {
 			doLast {
@@ -89,6 +109,7 @@ task stripLatexMarkup(dependsOn: replaceVersionInfo) {
 
 // Prüfe Vorgaben zur Texteingabe.
 task checkTexFiles(dependsOn: replaceVersionInfo) {
+	description = 'Check the conformity of the input LaTeX files.'
 	def inputFiles  = files { fileTree(dir: srcDir, includes: ['*.tex']) }
 	inputs.files inputFiles
 	doLast {
@@ -150,6 +171,7 @@ task checkTexFiles(dependsOn: replaceVersionInfo) {
 // Zusammengesetzte Wörter mit "-" ebenfalls
 // berücksichtigen.
 task listLigations() {
+	description = 'Find tokens that contain ligations, e. g. ff, fl, ...'
 	def inputFiles  = files { fileTree(dir: srcDir, includes: ['*.tex']) }
 	inputs.files inputFiles
 
@@ -186,11 +208,9 @@ task listLigations() {
 	}
 }
 
-task pdf(dependsOn: latexThirdRun) {
-	doLast { logger.info("PDF created.") }
-}
 
 task cpdCheck(type: JavaExec, dependsOn: stripLatexMarkup) {
+	description = 'Check for double text passages in the input files.'
 	main 'net.sourceforge.pmd.cpd.CPD'
 	classpath fileTree(dir: file('lib'), include: 'pmd*.jar')
 	args = [
@@ -208,6 +228,7 @@ task cpdCheck(type: JavaExec, dependsOn: stripLatexMarkup) {
 }
 
 task tokenFind(dependsOn: stripLatexMarkup) {
+	description = 'List all tokens found in the input files.'
 	def inputFiles  = files { fileTree(dir: file('build'), includes: ['*.tex.txt']) }
 	inputs.files inputFiles
 
@@ -232,4 +253,3 @@ task tokenFind(dependsOn: stripLatexMarkup) {
 
 }
 
-// cat /home/robert/git/Die_Heidin/Max_Mohr__Die_Heidin/src/main/latex/kapitel_1_1.tex | sed ':a;N;$!ba;s/\\-%\n\([a-z]*[\.,;:]* *\)/\1\n/g' | detex -
