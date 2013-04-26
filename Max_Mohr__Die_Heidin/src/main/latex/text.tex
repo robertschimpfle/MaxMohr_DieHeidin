@@ -15,7 +15,7 @@
 
 \usepackage[activate={true,nocompatibility},final,tracking,kerning,spacing,stretch=20,shrink=20]{microtype}
 
-\typearea[5mm]{11}
+\typearea[4mm]{11}
 
 %\linespread{1.05}
 
@@ -27,7 +27,9 @@
 
 \usepackage{lipsum}
 
-\usepackage{titlesec}
+%\usepackage{titlesec}
+
+\usepackage{color}
 
 \begin{document}
 
@@ -35,9 +37,6 @@
 
 
 % ******************* Definitionen, Makros *********************
-
-% Keine Kopfzeile, aber Seitennummer.
-\pagestyle{plain}
 
 % Abstand zwischen Absätzen.
 \def\abstand{\vspace{\baselineskip}\vspace{\baselineskip}\\}
@@ -59,6 +58,8 @@
 % Kapitelüberschrift.
 \def\kapitel#1{
 \clearpage{}
+\null
+\vspace{1ex}
 \addsec{#1}
 \vspace{\baselineskip}
 }
@@ -93,8 +94,9 @@
 
 \def\punkte{\kern .08em \ldots{}}
 
-
-
+\setkomafont{partentrypagenumber}{\color{white}}
+\setkomafont{chapterentry}{\normalfont}
+\setkomafont{chapterentrypagenumber}{\color{white}}
 
 % ************************ Vorspann ****************************
 \include{titel}
@@ -103,6 +105,9 @@
 
 
 % ************************** Roman *****************************
+% Keine Kopfzeile, aber Seitennummer.
+\pagestyle{plain}
+
 \addpart{Die Heidin}
 
 \linenumbers % Ab hier Zeilennummer pro Seite erfassen.
@@ -133,12 +138,20 @@
 
 
 % ************************* Anhang *****************************
-\addpart{Anhang}
+\addpart{Anhang\vspace{2mm}}
 \cleardoublepage
 \begin{small}
 
 \include{anmerkungen}
 \include{zum_band}
+
+\kapitel{Und noch ein Kapitel}
+
+\lipsum
+
+\kapitel{das allerletzte Kapitel}
+
+\lipsum
 
 \end{small}
 
