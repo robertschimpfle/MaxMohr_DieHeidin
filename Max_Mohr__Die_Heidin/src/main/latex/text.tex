@@ -13,7 +13,7 @@
 \usepackage[paperwidth=135mm,paperheight=215mm]{geometry}
 %\usepackage[a4,frame,center]{crop}
 
-\usepackage[activate={true,nocompatibility},final,tracking,kerning,spacing,stretch=20,shrink=20]{microtype}
+\usepackage[activate={true,nocompatibility},final,tracking,kerning,spacing,stretch=25,shrink=20]{microtype}
 
 \typearea[4mm]{11}
 
@@ -31,6 +31,10 @@
 
 \usepackage{color}
 
+%\clubpenalty10000
+%\widowpenalty10000
+%\displaywidowpenalty = 10000
+
 \begin{document}
 
 
@@ -40,6 +44,8 @@
 
 % Abstand zwischen Absätzen.
 \def\abstand{\vspace{\baselineskip}\vspace{\baselineskip}\\}
+
+\def\abstanddrei{\vspace{\baselineskip}\vspace{\baselineskip}\vspace{\baselineskip}\\}
 
 % Endnoten größer machen.
 \def\enotesize{\small}
@@ -59,7 +65,7 @@
 \def\kapitel#1{
 \clearpage{}
 \null
-\vspace{1ex}
+\vspace{2.5ex}
 \addsec{#1}
 \vspace{\baselineskip}
 }
@@ -144,14 +150,6 @@
 
 \include{anmerkungen}
 \include{zum_band}
-
-\kapitel{Und noch ein Kapitel}
-
-\lipsum
-
-\kapitel{das allerletzte Kapitel}
-
-\lipsum
 
 \end{small}
 
