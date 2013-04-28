@@ -97,33 +97,68 @@ task latexThirdRun(type: Exec, dependsOn: latexSecondRun) {
 
 // Buchstaben.
 def b = 'a-zA-ZÄÖÜäöüßçéèáà'
+def sz = '\\.,;:!?«» '
 
 task stripLatexMarkup(dependsOn: ['resources', 'replaceVersionInfo']) {
 	description = 'Convert all input LaTeX files to plain text files.'
 	inputs.files replaceVersionInfo.outputs
 	outputs.file txtDir
-	fileTree(dir: file('build'), include: '**/*.tex').each { file ->
+	fileTree(dir: buildSrcDir, include: '**/*.tex').each { file ->
 		if (! file.text.contains('%%SuppressWarnings("ContentCheck")')) {
 			doLast {
+				String fileContent = file.text
+				logger.info("Working on file ${file.name}")
+				
+				// Wenn Speicherprobleme, das ganze durch Matcher aus JavaSE ersetzen:
+				// An engine that performs match operations on a character sequence by interpreting a Pattern.
+				
+				def ersetzt = fileContent
+				
+				// Satzzeichen wieder herstellen.
+				ersetzt =
+					ersetzt
+						.replaceAll(/\\aa(nah){0,1}\{\}/, '«')
+						.replaceAll(/\\ae\{\}/, '»')
+						.replaceAll(/\\dopp\{\}/, ':')
+						.replaceAll(/\\semi\{\}/, ';')
+						.replaceAll(/\\frag\{\}/, '?')
+						.replaceAll(/\\ausr\{\}/, '!')
+						.replaceAll(/\\punkte\{\}/, '...')
+
+				// Ersetze Trenner.
+				ersetzt =
+					ersetzt.replaceAll(/([${b}])("-|\\-)([${b}])/, '$1$3')
+
+				// Ersetze Ligaturtrenner.
+				ersetzt =
+					ersetzt.replaceAll(/"\|/, '')
+
+				// Getrennte Wörter zusammenziehen.
+				ersetzt =
+					ersetzt.replaceAll(/(("-|\\-)%\n)(% [${b}]+\n)*([${b}-]+[${sz}]*)/, '$4\n$3')
+					
+				// Verbundene Wörter zusammenziehen.
+				ersetzt =
+					ersetzt.replaceAll(/(([${b}]+-)%\n)(% [${b}]+\n)*([${b}-]+[${sz}]*)/, '$2$4\n$3')
+					
+				// Bindende Zeilenumbrüche entfernen.
+				ersetzt =
+					ersetzt.replaceAll(/\\\\\*/, '\\\\\\\\')
+					
+				// begin und end Makros entfernen.
+				ersetzt =
+					ersetzt.replaceAll(/\\(begin|end)\{.+\}/, '')
+					
+				// Eingriff-Makro samt Inhalt entfernen
+				ersetzt =
+					ersetzt.replaceAll(/\\eingriff\{.*\}/, '')
+					
 				exec {
-					commandLine('bash', '-c', 'cat ' +
-						file +
-//						// Am Zeilenende mit \-% getrennte Wörter hochziehen.
-//						//' | sed \':a;N;$!ba;s/\\\\-%\\n\\(['+b+']*[\\.,;: ]*\\)/\\1\\n/g\'' +
-//						' | sed \':a;N;$!ba;s/\\\\-%\\n\\(%[^\\n]*\\n\\)*\\(['+b+']*[\\.,;:!? ]*\\)/\\2\\1\\n/g\'' +
-//						
-//						// Am Zeilenende mit -% getrennte Wörter hochziehen.
-//						' | sed \':a;N;$!ba;s/\\(['+b+']-\\)%\\n\\(%[^\\n]*\\n\\)*\\(['+b+']*[\\.,;:!? ]*\\)/\\1\\3\\2\\n/g\'' +
-//				//						' | sed \':a;N;$!ba;s/(?<!\\\\)+-%\\n\\(%.+\\n\\)*\\([' + b + ']*[.,;:!? ]*\\)/-(a)\\2(b)\\n(c)\\1(d)/g\'' +
-//						// Trenner "- entfernen: detex erkennt sie nicht.
-//						' | sed \'s/"-//\'' +
-//						// Zeilenumbrüche //* entfernen: detex erkennt sie nicht.
-//						' | sed \'s/\\\\\\\\\\*//\'' +
-//						// \eingrif{...} \begin{...} \end{...} entfernen.
-//						
-//						// Remove remaining tex tags.
-						' | detex - > ' + new File(txtDir, file.name + '.txt'))
+					commandLine('bash', '-c', 'detex - > ' + new File(txtDir, file.name + '.txt'))
+					standardInput = new ByteArrayInputStream(ersetzt.getBytes('UTF-8'))
 				}
+					
+//				new File(txtDir, file.name + '.txt').write(ohneEingriff)
 			}
 		}
 	}
@@ -192,35 +227,40 @@ task checkTexFiles(dependsOn: replaceVersionInfo) {
 // bzw. in der nächsten Zeile enden können.
 // Zusammengesetzte Wörter mit "-" ebenfalls
 // berücksichtigen.
-task listLigations() {
+task listLigations(dependsOn: replaceVersionInfo) {
 	description = 'Find tokens that contain ligations, e. g. ff, fl, ...'
 	def inputFiles  = files { fileTree(dir: srcDir, includes: ['*.tex']) }
 	inputs.files inputFiles
 
 	doLast {
 		def ligaturen = [['f', 'f'], ['t', 't'], ['f', 'l']]
+				
 		def liste = []
 		inputFiles.each {
+
 			String fileContent = it.text
 
-			ligaturen.each {
-				def ligatur = "${it[0]}(\\-){0,1}${it[1]}"
-				def restZeile = "([${b}]|(\\-[${b}]))"
-				def restZeile0 = "${restZeile}*"
-				def restZeile1 = "${restZeile}+"
-				def trennerZeilenende = "\\-%\n"
-				def vorherigeZeile =
-					"(${restZeile1}${trennerZeilenende}){0,1}"
-				def nächsteZeile =
-					"(${trennerZeilenende}${restZeile1}){0,1}"
-				
-				def matcher =
-					fileContent =~
-						/${vorherigeZeile}${restZeile0}${ligatur}${restZeile0}${nächsteZeile}/
+			if (! fileContent.contains('%%SuppressWarnings("ContentCheck")')) {
 
-				matcher.each {
-					String wort = it[0].replaceAll('\\\\-', '').replaceAll('%', '').replaceAll('\n', '')
-					if (! liste.contains(wort)) { liste.add(wort) }
+				ligaturen.each {
+					def ligatur = "${it[0]}(\\-){0,1}${it[1]}"
+					def restZeile = "([${b}]|(\\-[${b}]))"
+					def restZeile0 = "${restZeile}*"
+					def restZeile1 = "${restZeile}+"
+					def trennerZeilenende = "\\-%\n"
+					def vorherigeZeile =
+						"(${restZeile1}${trennerZeilenende}){0,1}"
+					def nächsteZeile =
+						"(${trennerZeilenende}${restZeile1}){0,1}"
+
+					def matcher =
+						fileContent =~
+							/${vorherigeZeile}${restZeile0}${ligatur}${restZeile0}${nächsteZeile}/
+
+					matcher.each {
+						String wort = it[0].replaceAll('\\\\-', '').replaceAll('%', '').replaceAll('\n', '')
+						if (! liste.contains(wort)) { liste.add(wort) }
+					}
 				}
 			}
 		}
@@ -234,14 +274,14 @@ task listLigations() {
 task cpdCheck(type: JavaExec, dependsOn: stripLatexMarkup) {
 	description = 'Check for double text passages in the input files.'
 	main 'net.sourceforge.pmd.cpd.CPD'
-	//classpath fileTree(dir: file('lib'), include: 'pmd*.jar')
+	classpath fileTree(dir: file('lib'), include: 'pmd*.jar')
 	classpath project.configurations.cpd
 	args = [
 		'--minimum-tokens', minimumDuplicateTokens,
 		'--format', 'xml',
 		'--encoding', 'UTF-8',
 		'--language', 'latex',
-		'--files', file('build')
+		'--files', txtDir
 	]
 	standardOutput = new ByteArrayOutputStream()
 	ignoreExitValue true
@@ -252,13 +292,13 @@ task cpdCheck(type: JavaExec, dependsOn: stripLatexMarkup) {
 
 task tokenFind(dependsOn: stripLatexMarkup) {
 	description = 'List all tokens found in the input files.'
-	def inputFiles  = files { fileTree(dir: file('build'), includes: ['*.tex.txt']) }
+	def inputFiles  = files { fileTree(dir: txtDir, includes: ['*.tex.txt']) }
 	inputs.files inputFiles
 
 	doLast {
 		def liste = [:]
 		inputFiles.each {
-			def tokenizer = new StringTokenizer(it.text, "\n\r\f \t!?#\$%^&*()[]=+<>/;:.,", false)
+			def tokenizer = new StringTokenizer(it.text, "\n\r\f \t!?#\$%^&*()[]=+<>/;:.,«»", false)
 			try {
 				// Process all tokens of one line.
 				for (def token = tokenizer.nextToken(); token != null; token = tokenizer.nextToken()) {
