@@ -97,6 +97,7 @@ task latexThirdRun(type: Exec, dependsOn: latexSecondRun) {
 
 // Buchstaben.
 def b = 'a-zA-ZÄÖÜäöüßçéèáà'
+def sz = '\\.,;:!?«» '
 
 task stripLatexMarkup(dependsOn: ['resources', 'replaceVersionInfo']) {
 	description = 'Convert all input LaTeX files to plain text files.'
@@ -105,25 +106,55 @@ task stripLatexMarkup(dependsOn: ['resources', 'replaceVersionInfo']) {
 	fileTree(dir: file('build'), include: '**/*.tex').each { file ->
 		if (! file.text.contains('%%SuppressWarnings("ContentCheck")')) {
 			doLast {
+				String fileContent = file.text
+				logger.info("Working on file ${file.name}")
+				
+				// Wenn Speicherprobleme, das ganze durch Matcher aus JavaSE ersetzen:
+				// An engine that performs match operations on a character sequence by interpreting a Pattern.
+				
+				def ersetzt = fileContent
+				
+				// Satzzeichen wieder herstellen.
+				ersetzt =
+					ersetzt
+						.replaceAll(/\\aa(nah){0,1}\{\}/, '«')
+						.replaceAll(/\\ae\{\}/, '»')
+						.replaceAll(/\\dopp\{\}/, ':')
+						.replaceAll(/\\semi\{\}/, ';')
+						.replaceAll(/\\frag\{\}/, '?')
+						.replaceAll(/\\ausr\{\}/, '!')
+						.replaceAll(/\\punkte\{\}/, '...')
+
+				// Ersetze Trenner.
+				ersetzt =
+					ersetzt.replaceAll(/([${b}])("-|\\-)([${b}])/, '$1$3')
+
+				// Getrennte Wörter zusammenziehen.
+				ersetzt =
+					ersetzt.replaceAll(/(("-|\\-)%\n)(% [${b}]+\n)*([${b}-]+[${sz}]*)/, '$4\n$3')
+					
+				// Verbundene Wörter zusammenziehen.
+				ersetzt =
+					ersetzt.replaceAll(/(([${b}]+-)%\n)(% [${b}]+\n)*([${b}-]+[${sz}]*)/, '$2$4\n$3')
+					
+				// Bindende Zeilenumbrüche entfernen.
+				ersetzt =
+					ersetzt.replaceAll(/\\\\\*/, '\\\\\\\\')
+					
+				// begin und end Makros entfernen.
+				ersetzt =
+					ersetzt.replaceAll(/\\(begin|end)\{.+\}/, '')
+					
+				// Eingriff-Makro samt Inhalt entfernen
+				ersetzt =
+					ersetzt.replaceAll(/\\eingriff\{.*\}/, '')
+					
 				exec {
-					commandLine('bash', '-c', 'cat ' +
-						file +
-//						// Am Zeilenende mit \-% getrennte Wörter hochziehen.
-//						//' | sed \':a;N;$!ba;s/\\\\-%\\n\\(['+b+']*[\\.,;: ]*\\)/\\1\\n/g\'' +
-//						' | sed \':a;N;$!ba;s/\\\\-%\\n\\(%[^\\n]*\\n\\)*\\(['+b+']*[\\.,;:!? ]*\\)/\\2\\1\\n/g\'' +
-//						
-//						// Am Zeilenende mit -% getrennte Wörter hochziehen.
-//						' | sed \':a;N;$!ba;s/\\(['+b+']-\\)%\\n\\(%[^\\n]*\\n\\)*\\(['+b+']*[\\.,;:!? ]*\\)/\\1\\3\\2\\n/g\'' +
-//				//						' | sed \':a;N;$!ba;s/(?<!\\\\)+-%\\n\\(%.+\\n\\)*\\([' + b + ']*[.,;:!? ]*\\)/-(a)\\2(b)\\n(c)\\1(d)/g\'' +
-//						// Trenner "- entfernen: detex erkennt sie nicht.
-//						' | sed \'s/"-//\'' +
-//						// Zeilenumbrüche //* entfernen: detex erkennt sie nicht.
-//						' | sed \'s/\\\\\\\\\\*//\'' +
-//						// \eingrif{...} \begin{...} \end{...} entfernen.
-//						
-//						// Remove remaining tex tags.
-						' | detex - > ' + new File(txtDir, file.name + '.txt'))
+					commandLine('bash', '-c', 'detex - > ' + new File(txtDir, file.name + '.txt'))
+					standardInput = new ByteArrayInputStream(ersetzt.getBytes('UTF-8'))
 				}
+					
+//				new File(txtDir, file.name + '.txt').write(ohneEingriff)
 			}
 		}
 	}
