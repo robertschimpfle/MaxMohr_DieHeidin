@@ -11,15 +11,19 @@ repositories {
 	mavenCentral()
 }
 
+configurations { cpd }
+
 dependencies {
-	testCompile 'junit:junit:4.11'
 	compile 'org.codehaus.groovy:groovy-all:2.1.1'
+	testCompile 'junit:junit:4.11'
+	cpd 'net.sourceforge.pmd:pmd:5.0.3'
 }
 
 ext.srcDir = file 'src/main/latex'
 ext.buildSrcDir = file 'build/src/main/latex'
 ext.inputFile = 'text.tex'
 ext.pdfDir = file 'build/pdf'
+ext.txtDir = file 'build/txt'
 
 task replaceVersionInfo(type: Copy) {
 	description = 'Replace the version information in the book.'
@@ -36,8 +40,10 @@ task replaceVersionInfo(type: Copy) {
 
 task resources(dependsOn: replaceVersionInfo) {
 	outputs.file pdfDir
+	outputs.file txtDir
 	doLast {
 		pdfDir.mkdirs()
+		txtDir.mkdirs()
 	}
 }
 
@@ -92,29 +98,31 @@ task latexThirdRun(type: Exec, dependsOn: latexSecondRun) {
 // Buchstaben.
 def b = 'a-zA-ZÄÖÜäöüßçéèáà'
 
-task stripLatexMarkup(dependsOn: replaceVersionInfo) {
+task stripLatexMarkup(dependsOn: ['resources', 'replaceVersionInfo']) {
 	description = 'Convert all input LaTeX files to plain text files.'
-	fileTree(dir: file('build'), include: '*.tex').each { file ->
+	inputs.files replaceVersionInfo.outputs
+	outputs.file txtDir
+	fileTree(dir: file('build'), include: '**/*.tex').each { file ->
 		if (! file.text.contains('%%SuppressWarnings("ContentCheck")')) {
 			doLast {
 				exec {
 					commandLine('bash', '-c', 'cat ' +
 						file +
-						// Am Zeilenende mit \-% getrennte Wörter hochziehen.
-						//' | sed \':a;N;$!ba;s/\\\\-%\\n\\(['+b+']*[\\.,;: ]*\\)/\\1\\n/g\'' +
-						' | sed \':a;N;$!ba;s/\\\\-%\\n\\(%[^\\n]*\\n\\)*\\(['+b+']*[\\.,;:!? ]*\\)/\\2\\1\\n/g\'' +
-						
-						// Am Zeilenende mit -% getrennte Wörter hochziehen.
-						' | sed \':a;N;$!ba;s/\\(['+b+']-\\)%\\n\\(%[^\\n]*\\n\\)*\\(['+b+']*[\\.,;:!? ]*\\)/\\1\\3\\2\\n/g\'' +
-				//						' | sed \':a;N;$!ba;s/(?<!\\\\)+-%\\n\\(%.+\\n\\)*\\([' + b + ']*[.,;:!? ]*\\)/-(a)\\2(b)\\n(c)\\1(d)/g\'' +
-						// Trenner "- entfernen: detex erkennt sie nicht.
-						' | sed \'s/"-//\'' +
-						// Zeilenumbrüche //* entfernen: detex erkennt sie nicht.
-						' | sed \'s/\\\\\\\\\\*//\'' +
-						// \eingrif{...} \begin{...} \end{...} entfernen.
-						
-						// Remove remaining tex tags.
-						/*' | detex -*/ ' > ' + file + '.txt')
+//						// Am Zeilenende mit \-% getrennte Wörter hochziehen.
+//						//' | sed \':a;N;$!ba;s/\\\\-%\\n\\(['+b+']*[\\.,;: ]*\\)/\\1\\n/g\'' +
+//						' | sed \':a;N;$!ba;s/\\\\-%\\n\\(%[^\\n]*\\n\\)*\\(['+b+']*[\\.,;:!? ]*\\)/\\2\\1\\n/g\'' +
+//						
+//						// Am Zeilenende mit -% getrennte Wörter hochziehen.
+//						' | sed \':a;N;$!ba;s/\\(['+b+']-\\)%\\n\\(%[^\\n]*\\n\\)*\\(['+b+']*[\\.,;:!? ]*\\)/\\1\\3\\2\\n/g\'' +
+//				//						' | sed \':a;N;$!ba;s/(?<!\\\\)+-%\\n\\(%.+\\n\\)*\\([' + b + ']*[.,;:!? ]*\\)/-(a)\\2(b)\\n(c)\\1(d)/g\'' +
+//						// Trenner "- entfernen: detex erkennt sie nicht.
+//						' | sed \'s/"-//\'' +
+//						// Zeilenumbrüche //* entfernen: detex erkennt sie nicht.
+//						' | sed \'s/\\\\\\\\\\*//\'' +
+//						// \eingrif{...} \begin{...} \end{...} entfernen.
+//						
+//						// Remove remaining tex tags.
+						' | detex - > ' + new File(txtDir, file.name + '.txt'))
 				}
 			}
 		}
@@ -226,7 +234,8 @@ task listLigations() {
 task cpdCheck(type: JavaExec, dependsOn: stripLatexMarkup) {
 	description = 'Check for double text passages in the input files.'
 	main 'net.sourceforge.pmd.cpd.CPD'
-	classpath fileTree(dir: file('lib'), include: 'pmd*.jar')
+	//classpath fileTree(dir: file('lib'), include: 'pmd*.jar')
+	classpath project.configurations.cpd
 	args = [
 		'--minimum-tokens', minimumDuplicateTokens,
 		'--format', 'xml',
