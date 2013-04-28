@@ -1,16 +1,25 @@
 import java.text.SimpleDateFormat
 
+// Wird gebraucht für inputs / outputs Featur der Tasks.
 apply plugin: 'base'
+apply plugin: 'groovy'
+apply plugin: 'eclipse'
 
 defaultTasks 'pdf'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	testCompile 'junit:junit:4.11'
+	compile 'org.codehaus.groovy:groovy-all:2.1.1'
+}
 
 ext.srcDir = file 'src/main/latex'
 ext.buildSrcDir = file 'build/src/main/latex'
 ext.inputFile = 'text.tex'
 ext.pdfDir = file 'build/pdf'
-
-// Buchstaben.
-def b = 'a-zA-ZÄÖÜäöüßçéèáà'
 
 task replaceVersionInfo(type: Copy) {
 	description = 'Replace the version information in the book.'
@@ -77,6 +86,11 @@ task latexThirdRun(type: Exec, dependsOn: latexSecondRun) {
 		logger.info 'LaTeX third run.'
 	}
 }
+
+
+
+// Buchstaben.
+def b = 'a-zA-ZÄÖÜäöüßçéèáà'
 
 task stripLatexMarkup(dependsOn: replaceVersionInfo) {
 	description = 'Convert all input LaTeX files to plain text files.'
