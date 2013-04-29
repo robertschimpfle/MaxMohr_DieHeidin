@@ -24,6 +24,7 @@ ext.buildSrcDir = file 'build/src/main/latex'
 ext.inputFile = 'text.tex'
 ext.pdfDir = file 'build/pdf'
 ext.txtDir = file 'build/txt'
+ext.statsDir = file 'build/stats'
 
 task replaceVersionInfo(type: Copy) {
 	description = 'Replace the version information in the book.'
@@ -41,9 +42,11 @@ task replaceVersionInfo(type: Copy) {
 task resources(dependsOn: replaceVersionInfo) {
 	outputs.file pdfDir
 	outputs.file txtDir
+	outputs.files statsDir
 	doLast {
 		pdfDir.mkdirs()
 		txtDir.mkdirs()
+		statsDir.mkdirs()
 	}
 }
 
@@ -130,6 +133,7 @@ task stripLatexMarkup(dependsOn: ['resources', 'replaceVersionInfo']) {
 					ersetzt.replaceAll(/([${b}])("-|\\-)([${b}])/, '$1$3')
 
 				// Ersetze Ligaturtrenner.
+				// TODO not working
 				ersetzt =
 					ersetzt.replaceAll(/"\|/, '')
 
@@ -149,9 +153,9 @@ task stripLatexMarkup(dependsOn: ['resources', 'replaceVersionInfo']) {
 				ersetzt =
 					ersetzt.replaceAll(/\\(begin|end)\{.+\}/, '')
 					
-				// Eingriff-Makro samt Inhalt entfernen
+				// Eingriff- und Label-Makro samt Inhalt entfernen
 				ersetzt =
-					ersetzt.replaceAll(/\\eingriff\{.*\}/, '')
+					ersetzt.replaceAll(/\\(eingriff|label)\{.*\}/, '')
 					
 				exec {
 					commandLine('bash', '-c', 'detex - > ' + new File(txtDir, file.name + '.txt'))
@@ -227,10 +231,12 @@ task checkTexFiles(dependsOn: replaceVersionInfo) {
 // bzw. in der nächsten Zeile enden können.
 // Zusammengesetzte Wörter mit "-" ebenfalls
 // berücksichtigen.
-task listLigations(dependsOn: replaceVersionInfo) {
+task listLigations(dependsOn: ['replaceVersionInfo', 'resources']) {
 	description = 'Find tokens that contain ligations, e. g. ff, fl, ...'
+	def ausgabe = new File(statsDir, 'ligations.txt')
 	def inputFiles  = files { fileTree(dir: srcDir, includes: ['*.tex']) }
 	inputs.files inputFiles
+	outputs.file ausgabe
 
 	doLast {
 		def ligaturen = [['f', 'f'], ['t', 't'], ['f', 'l']]
@@ -264,15 +270,18 @@ task listLigations(dependsOn: replaceVersionInfo) {
 				}
 			}
 		}
-		println "Im Text gefundene Ligaturwörter mit den Doppelbuchstaben von ${ligaturen}:\n"
-		liste.sort{x, y -> x.compareToIgnoreCase y}.each {println it}
-		println "\n${liste.size} Wörter"
+		ausgabe.write "Im Text gefundene Ligaturwörter mit den Doppelbuchstaben von ${ligaturen}:\n"
+		liste.sort{ x, y -> x.compareToIgnoreCase y }.each{ zeile -> ausgabe.withWriterAppend { it.write "${zeile}\n" } }
+		ausgabe.withWriterAppend { it.write "\n${liste.size} Wörter\n" }
 	}
 }
 
 
 task cpdCheck(type: JavaExec, dependsOn: stripLatexMarkup) {
 	description = 'Check for double text passages in the input files.'
+	def ausgabe = new File(statsDir, 'cpd.xml')
+	inputs.file txtDir
+	outputs.file ausgabe
 	main 'net.sourceforge.pmd.cpd.CPD'
 	classpath fileTree(dir: file('lib'), include: 'pmd*.jar')
 	classpath project.configurations.cpd
@@ -286,15 +295,18 @@ task cpdCheck(type: JavaExec, dependsOn: stripLatexMarkup) {
 	standardOutput = new ByteArrayOutputStream()
 	ignoreExitValue true
 	doLast {
-		file('build/cpd.xml').write(standardOutput.toString())
+		ausgabe.write standardOutput.toString()
 	}
 }
 
 task tokenFind(dependsOn: stripLatexMarkup) {
 	description = 'List all tokens found in the input files.'
 	def inputFiles  = files { fileTree(dir: txtDir, includes: ['*.tex.txt']) }
+	def ausgabe = new File(statsDir, 'tokens.xml')
 	inputs.files inputFiles
+	outputs.file ausgabe
 
+	// Dateien tokenisieren und Ergebnis in Map speichern.
 	doLast {
 		def liste = [:]
 		inputFiles.each {
@@ -303,15 +315,36 @@ task tokenFind(dependsOn: stripLatexMarkup) {
 				// Process all tokens of one line.
 				for (def token = tokenizer.nextToken(); token != null; token = tokenizer.nextToken()) {
 					if (token != '--') {
-						if (liste.get(token)) { liste[token]++}
-						else { liste[token] = 1 }
+						if (! liste.get(token)) { liste[token] = [:] }
+						if (! liste.get(token).get(it.name)) { liste[token][it.name] = [] }
+						liste[token][it.name].add(47)
 					}
 				}
 			} catch (NoSuchElementException ex) { /* Done with the line. */ }
 		}
-	
-		println "${liste.size()} im Text gefundene Tokens:\n"
-		liste.sort{it.key}.sort{it.value}.each{println "${it.value}".padLeft(4) + ": ${it.key}"}
+
+		// Sortieren nach Häufigkeit.
+		liste = liste.sort{
+			def tokenCount = 0
+			it.value.each { k, v -> tokenCount += v.size() }
+			tokenCount
+		}
+		
+		// Map in XML-Datei umwandeln.
+		def sw = new StringWriter()
+		new groovy.xml.MarkupBuilder(sw).with {
+			doubleQuotes = true
+			def visitorToken = { k, v ->
+				'occurrence'('file': k, 'line': v)
+			}
+			def visitor = { k, v ->
+				'token'('name': k) { v.collect(visitorToken) }
+			}
+			mkp.xmlDeclaration(version: '1.0')
+			'tokens' { liste.collect visitor }
+		}
+
+		ausgabe.write sw.toString()
 	}
 
 }
