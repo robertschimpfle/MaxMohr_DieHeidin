@@ -338,13 +338,17 @@ task tokenFind(dependsOn: ['stripLatexMarkup', 'copyCss']) {
 			} catch (NoSuchElementException ex) { /* Done with the file. */ }
 		}
 
-		// Sortieren nach Häufigkeit.
-		// TODO richtig sortieren!
-		liste = liste.sort{
+		// Closure für Vorkommenzählung.
+		def occurrenceCount = { occurrences ->
 			def tokenCount = 0
-			it.value.each { k, v -> tokenCount += v.size() }
+			occurrences.each { k, v ->
+				tokenCount += v.size()
+			}
 			tokenCount
 		}
+		
+		// Sortieren nach Tokenname und Häufigkeit.
+		liste = liste.sort { it.key}.sort { occurrenceCount(it.value) }
 		
 		// Map in XML-Datei umwandeln.
 		def sw = new StringWriter()
@@ -360,6 +364,7 @@ task tokenFind(dependsOn: ['stripLatexMarkup', 'copyCss']) {
 			def visitorTokens = { k, v ->
 				'token' {
 					'name' { mkp.yield k }
+					'tokencount' { mkp.yield occurrenceCount(v) }
 					'occurrences' {
 						v.collect(visitorToken)
 					}
