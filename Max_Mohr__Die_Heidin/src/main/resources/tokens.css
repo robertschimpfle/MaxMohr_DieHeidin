@@ -3,6 +3,7 @@ statistics {
 	margin: 10px;
 	padding: 5px;
 	vertical-align: top;
+	font-size: x-small;
 }
 
 overalltokens {
@@ -48,10 +49,6 @@ tokencount {
 	padding-bottom: 5px;
 	padding-left: 5px;
 	padding-right: 5px;
-}
-
-tokencount:before {
-	content: 'n = '
 }
 
 occurrences {
