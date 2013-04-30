@@ -374,6 +374,10 @@ task tokenFind(dependsOn: ['stripLatexMarkup', 'copyCss']) {
 			mkp.pi('xml-stylesheet': ['href': 'tokens.css', 'type': 'text/css'])
 			'tokens' {
 				'remark' { mkp.yield "${liste.size()} unique tokens found." }
+				'statistics' {
+					'overalltokencount' { mkp.yield '17' }
+					'overalluniquetokens' { mkp.yield '7' }
+				}
 				liste.collect visitorTokens
 			}
 		}

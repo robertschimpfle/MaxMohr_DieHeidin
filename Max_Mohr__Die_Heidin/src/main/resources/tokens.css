@@ -1,8 +1,24 @@
-remark {
+statistics {
 	display: block;
 	margin: 10px;
 	padding: 5px;
 	vertical-align: top;
+}
+
+overalltokencount {
+	display: inline-block;
+}
+
+overalltokencount:before {
+	content: 'Tokens:';
+}
+
+overalluniquetokens {
+	display: inline-block;
+}
+
+overalluniquetokens:before {
+	content: 'Unique: ';
 }
 
 token {
