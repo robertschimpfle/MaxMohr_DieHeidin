@@ -208,6 +208,10 @@ task checkTexFiles(dependsOn: replaceVersionInfo) {
 					if (it =~ /\t/) {
 						logger.error("Error: ${datei.name}:${lineCounter}, Tabulatorzeichen im Text: \"${it}\"")
 					}
+					// Satzzeichen im Text.
+					if (it =~ /[!?:;]/) {
+						logger.error("Error: ${datei.name}:${lineCounter}, Plain Satzzeichen (!?:;) im Text: \"${it}\"")
+					}
 					// Falscher Trenner.
 					if (it =~ /[^${b}]\\-[^${b}]/) {
 						logger.error("Error: ${datei.name}:${lineCounter}, Falscher Trennstrich: \"${it}\"")
