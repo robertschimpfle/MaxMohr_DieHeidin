@@ -381,3 +381,9 @@ task tokenFind(dependsOn: ['stripLatexMarkup', 'copyCss']) {
 	}
 
 }
+
+apply plugin: 'pmd'
+
+task peemdeh(type: Pmd) {
+	
+}
