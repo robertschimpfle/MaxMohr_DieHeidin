@@ -385,12 +385,3 @@ task tokenFind(dependsOn: ['stripLatexMarkup', 'copyCss']) {
 	}
 
 }
-// TEst.
-apply plugin: 'pmd'
-
-pmdMain {
-	reports {
-		xml.enabled true
-		html.enabled false
-	}
-}

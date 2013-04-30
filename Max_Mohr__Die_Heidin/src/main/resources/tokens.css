@@ -6,7 +6,7 @@ statistics {
 }
 
 overalltokencount {
-	display: inline-block;
+	display: block;
 }
 
 overalltokencount:before {
@@ -14,7 +14,7 @@ overalltokencount:before {
 }
 
 overalluniquetokens {
-	display: inline-block;
+	display: block;
 }
 
 overalluniquetokens:before {
