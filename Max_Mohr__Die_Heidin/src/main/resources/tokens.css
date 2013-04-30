@@ -8,14 +8,16 @@ statistics {
 
 overalltokens {
 	display: block;
+	padding: 5px;
 }
 
 overalltokens:before {
-	content: 'Tokens:';
+	content: 'Tokens: ';
 }
 
 overalluniquetokens {
 	display: block;
+	padding: 5px;
 }
 
 overalluniquetokens:before {
