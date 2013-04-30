@@ -25,7 +25,7 @@ ext.buildSrcDir = file 'build/src/main/latex'
 ext.inputFile = 'text.tex'
 ext.pdfDir = file 'build/pdf'
 ext.txtDir = file 'build/txt'
-ext.statsDir = file 'build/stats'
+ext.statsDir = file 'build/reports'
 
 task replaceVersionInfo(type: Copy) {
 	description = 'Replace the version information in the book.'
