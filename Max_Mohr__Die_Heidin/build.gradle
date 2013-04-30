@@ -20,6 +20,7 @@ dependencies {
 }
 
 ext.srcDir = file 'src/main/latex'
+ext.resourcesDir = file 'src/main/resources'
 ext.buildSrcDir = file 'build/src/main/latex'
 ext.inputFile = 'text.tex'
 ext.pdfDir = file 'build/pdf'
@@ -299,31 +300,46 @@ task cpdCheck(type: JavaExec, dependsOn: stripLatexMarkup) {
 	}
 }
 
-task tokenFind(dependsOn: stripLatexMarkup) {
+task copyCss(type: Copy, dependsOn: 'resources') {
+	description = 'Copy the CSS for the XML token file.'
+	from resourcesDir
+	into statsDir
+	include 'tokens.css'
+}
+
+task tokenFind(dependsOn: ['stripLatexMarkup', 'copyCss']) {
 	description = 'List all tokens found in the input files.'
 	def inputFiles  = files { fileTree(dir: txtDir, includes: ['*.tex.txt']) }
 	def ausgabe = new File(statsDir, 'tokens.xml')
 	inputs.files inputFiles
 	outputs.file ausgabe
 
+	def delimiters = '\n\r\f \t!?#\$%^&*()[]=+<>/;:.,«»'
 	// Dateien tokenisieren und Ergebnis in Map speichern.
 	doLast {
 		def liste = [:]
 		inputFiles.each {
-			def tokenizer = new StringTokenizer(it.text, "\n\r\f \t!?#\$%^&*()[]=+<>/;:.,«»", false)
+			def tokenizer = new StringTokenizer(it.text, delimiters, true)
+			def lineNumber = 1
 			try {
 				// Process all tokens of one line.
 				for (def token = tokenizer.nextToken(); token != null; token = tokenizer.nextToken()) {
-					if (token != '--') {
-						if (! liste.get(token)) { liste[token] = [:] }
-						if (! liste.get(token).get(it.name)) { liste[token][it.name] = [] }
-						liste[token][it.name].add(47)
+					if (token == '\n') {
+						lineNumber++
+					}
+					if (! delimiters.contains(token)) {
+						if (token != '--') {
+							if (! liste.get(token)) { liste[token] = [:] }
+							if (! liste.get(token).get(it.name)) { liste[token][it.name] = [] }
+							liste[token][it.name].add(lineNumber)
+						}
 					}
 				}
-			} catch (NoSuchElementException ex) { /* Done with the line. */ }
+			} catch (NoSuchElementException ex) { /* Done with the file. */ }
 		}
 
 		// Sortieren nach Häufigkeit.
+		// TODO richtig sortieren!
 		liste = liste.sort{
 			def tokenCount = 0
 			it.value.each { k, v -> tokenCount += v.size() }
@@ -334,18 +350,29 @@ task tokenFind(dependsOn: stripLatexMarkup) {
 		def sw = new StringWriter()
 		new groovy.xml.MarkupBuilder(sw).with {
 			doubleQuotes = true
+			def visitorLine = { 'line'('number': it) }
 			def visitorToken = { k, v ->
-				'occurrence'('file': k, 'line': v)
+				'occurrence' {
+					'filename' { mkp.yield k }
+					v.collect(visitorLine)
+				}
 			}
-			def visitor = { k, v ->
-				'token'('name': k) { v.collect(visitorToken) }
+			def visitorTokens = { k, v ->
+				'token' {
+					'name' { mkp.yield k }
+					'occurrences' {
+						v.collect(visitorToken)
+					}
+				}
 			}
 			mkp.xmlDeclaration(version: '1.0')
-			'tokens' { liste.collect visitor }
+			mkp.pi('xml-stylesheet': ['href': 'tokens.css', 'type': 'text/css'])
+			'tokens' {
+				'remark' { mkp.yield "${liste.size()} unique tokens found." }
+				liste.collect visitorTokens
+			}
 		}
-
 		ausgabe.write sw.toString()
 	}
 
 }
-
