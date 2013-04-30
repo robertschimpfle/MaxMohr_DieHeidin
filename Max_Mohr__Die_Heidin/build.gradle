@@ -352,6 +352,7 @@ task tokenFind(dependsOn: ['stripLatexMarkup', 'copyCss']) {
 		
 		// Map in XML-Datei umwandeln.
 		def sw = new StringWriter()
+		
 		new groovy.xml.MarkupBuilder(sw).with {
 			doubleQuotes = true
 			def visitorLine = { 'line'('number': it) }
@@ -375,7 +376,7 @@ task tokenFind(dependsOn: ['stripLatexMarkup', 'copyCss']) {
 			'tokens' {
 				'statistics' {
 					'overalltokencount' { mkp.yield '17' }
-					'overalluniquetokens' { mkp.yield list.size() }
+					'overalluniquetokens' { mkp.yield liste.size() }
 				}
 				liste.collect visitorTokens
 			}
