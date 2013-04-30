@@ -387,4 +387,5 @@ apply plugin: 'pmd'
 pmdMain {
 	xml.enabled true
 	html.enabled false
+
 }
