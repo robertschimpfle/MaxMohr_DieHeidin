@@ -381,7 +381,7 @@ task tokenFind(dependsOn: ['stripLatexMarkup', 'copyCss']) {
 	}
 
 }
-
+// TEst.
 apply plugin: 'pmd'
 
 pmdMain {
