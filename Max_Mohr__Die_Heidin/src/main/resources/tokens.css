@@ -5,11 +5,11 @@ statistics {
 	vertical-align: top;
 }
 
-overalltokencount {
+overalltokens {
 	display: block;
 }
 
-overalltokencount:before {
+overalltokens:before {
 	content: 'Tokens:';
 }
 
