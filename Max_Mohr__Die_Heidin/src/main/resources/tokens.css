@@ -72,6 +72,7 @@ occurrence {
 	display: inline;
 	padding-right: 20px;
 	font-family: monospace;
+	font-size: x-small;
 }
 
 filename {
