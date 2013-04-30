@@ -24,6 +24,15 @@ overalluniquetokens:before {
 	content: 'Unique: ';
 }
 
+tokenratio {
+	display: block;
+	padding: 5px;
+}
+
+tokenratio:before {
+	content: 'Ratio: ';
+}
+
 token {
 	display: block;
 	background-color: lightsteelblue;

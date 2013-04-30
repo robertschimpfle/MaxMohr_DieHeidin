@@ -381,6 +381,7 @@ task tokenFind(dependsOn: ['stripLatexMarkup', 'copyCss']) {
 				'statistics' {
 					'overalltokens' { mkp.yield liste.values().sum { occurrenceCount(it) } }
 					'overalluniquetokens' { mkp.yield liste.size() }
+					'tokenratio' { mkp.yield(liste.values().sum { occurrenceCount(it) } / liste.size()) }
 				}
 				liste.collect visitorTokens
 			}
