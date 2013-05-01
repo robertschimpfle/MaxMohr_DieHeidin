@@ -1,34 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>Max_Mohr__Die_Heidin</name>
-	<comment/>
-	<projects/>
-	<natures>
-		<nature>org.springsource.ide.eclipse.gradle.core.nature</nature>
-		<nature>org.eclipse.jdt.core.javanature</nature>
-		<nature>org.eclipse.jdt.groovy.core.groovyNature</nature>
-		<nature>net.sourceforge.texlipse.builder.TexlipseNature</nature>
-	</natures>
+	<comment></comment>
+	<projects>
+	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>org.eclipse.jdt.core.javabuilder</name>
-			<arguments/>
+			<name>net.sourceforge.texlipse.builder.TexlipseBuilder</name>
+			<arguments>
+			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>net.sourceforge.texlipse.builder.TexlipseBuilder</name>
-			<arguments/>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
 		</buildCommand>
 	</buildSpec>
-	<linkedResources>
-		<link>
-			<name>.tex</name>
-			<type>1</type>
-			<location>/usr/share/texmf-texlive/tex/latex/tools/.tex</location>
-		</link>
-		<link>
-			<name>src/main/latex/.tex</name>
-			<type>1</type>
-			<location>/usr/share/texmf-texlive/tex/latex/tools/.tex</location>
-		</link>
-	</linkedResources>
+	<natures>
+		<nature>net.sourceforge.texlipse.builder.TexlipseNature</nature>
+		<nature>org.eclipse.jdt.groovy.core.groovyNature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
 </projectDescription>
