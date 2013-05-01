@@ -31,9 +31,13 @@
 
 \usepackage{color}
 
-%\clubpenalty10000
-%\widowpenalty10000
-%\displaywidowpenalty = 10000
+% Counters als Nummer verwenden.
+\usepackage{refcount}
+
+\usepackage{ifthen}
+
+% Überschriften zentrieren.
+\renewcommand*{\raggedsection}{\centering}
 
 \begin{document}
 
@@ -57,6 +61,21 @@
 \newcommand{\eingriff}[2]{\linelabel{#1}\endnotetext{\makebox[0em][r]
 {\pageref{#1}},
 \makebox[1em][r]{\ref{#1}}\makebox[1em]{}#2}}
+
+% Anmerkung.
+\newcounter{anmseite}
+\newcounter{anmrefseite}
+
+\newcommand{\anmerkung}[3]{%
+\begin{addmargin*}[2.5em]{0em}%
+\ifthenelse{\(\pageref{#1}=\arabic{anmrefseite}\)\AND\(\thepage=\value{anmseite}\)}%
+{\hspace{-2.5em}\makebox[2em][c]{}\hspace{0.5em}}%
+{\hspace{-2.5em}\makebox[2em][c]{\pageref{#1}}\hspace{0.5em}}%
+\setcounter{anmrefseite}{\getpagerefnumber{#1}}%
+\setcounter{anmseite}{\thepage}%
+\begin{it}#2\end{it} -- #3%
+\end{addmargin*}%
+}
 
 % Überschrift der Endnoten verschwinden lassen.
 \renewcommand{\notesname}{\vspace{-1cm}}
@@ -148,7 +167,7 @@
 \cleardoublepage
 \begin{small}
 
-%\include{anmerkungen}
+\include{anmerkungen}
 \include{zum_band}
 
 \end{small}
