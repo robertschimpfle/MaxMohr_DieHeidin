@@ -66,6 +66,8 @@
 \newcounter{anmseite}
 \newcounter{anmrefseite}
 
+% TODO Nicht mit Einzug arbeiten, sondern zwei Boxen nebeneinander:
+% Eine für die Seitenzahl und eine gleich hohe für den Text
 \newcommand{\anmerkung}[3]{%
 \begin{addmargin*}[2.5em]{0em}%
 \ifthenelse{\(\pageref{#1}=\arabic{anmrefseite}\)\AND\(\thepage=\value{anmseite}\)}%
