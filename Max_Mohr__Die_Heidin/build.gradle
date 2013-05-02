@@ -123,6 +123,8 @@ task stripLatexMarkup(dependsOn: ['resources', 'replaceVersionInfo']) {
 					ersetzt
 						.replaceAll(/\\aa(nah){0,1}\{\}/, '«')
 						.replaceAll(/\\ae\{\}/, '»')
+						.replaceAll(/\\haa\{\}/, '‹')
+						.replaceAll(/\\hae\{\}/, '›')
 						.replaceAll(/\\dopp\{\}/, ':')
 						.replaceAll(/\\semi\{\}/, ';')
 						.replaceAll(/\\frag\{\}/, '?')
