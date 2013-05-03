@@ -67,14 +67,17 @@
 \newcounter{anmrefseite}
 
 \newcommand{\anmerkung}[3]{%
-\begin{addmargin}[2.5em]{0em}%
+\begin{addmargin*}[2.5em]{0em}%
+\hspace{-2.5em}\makebox[2em][r]{%
 \ifthenelse{\(\pageref{#1}=\arabic{anmrefseite}\)\AND\(\thepage=\value{anmseite}\)}%
-{\hspace{-2.5em}\makebox[2em][r]{}\hspace{0.1em}}%
-{\hspace{-2.5em}\makebox[2em][r]{\pageref{#1}}\hspace{0.1em}}%
+{}%
+{\pageref{#1}}%
+}%
+\hspace{0.5em}%
 \setcounter{anmrefseite}{\getpagerefnumber{#1}}%
 \setcounter{anmseite}{\thepage}%
 \begin{it}#2\end{it} -- #3%
-\end{addmargin}%
+\end{addmargin*}%
 }
 
 % Überschrift der Endnoten verschwinden lassen.
