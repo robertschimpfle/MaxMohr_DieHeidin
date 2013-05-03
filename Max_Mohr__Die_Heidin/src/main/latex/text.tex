@@ -36,6 +36,8 @@
 
 \usepackage{ifthen}
 
+%\usepackage{hyperref}
+
 % Überschriften zentrieren.
 \renewcommand*{\raggedsection}{\centering}
 
@@ -65,6 +67,14 @@
 % Anmerkung.
 \newcounter{anmseite}
 \newcounter{anmrefseite}
+
+% TODO Hier zukünftig mit \addtocontents oder \addcontentsline
+% arbeiten, siehe Doku zu Komascript:
+% Das Paket tocbasic ist neu in KOMA - Script 3.00. Sein Hauptzweck besteht
+% darin, Paket- und Klassenautoren die Möglichkeit zu geben, eigene Ver-
+% zeichnisse vergleichbar mit dem Abbildungs- und Tabellenverzeichnis zu
+% erstellen und dabei Klassen und anderen Paketen einen Teil der Kontrolle
+% über diese Verzeichnisse zu erlauben.
 
 \newcommand{\anmerkung}[3]{%
 \begin{addmargin}[2.4em]{0em}%
