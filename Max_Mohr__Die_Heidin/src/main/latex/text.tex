@@ -38,6 +38,8 @@
 
 %\usepackage{hyperref}
 
+\usepackage{calc}
+
 % Überschriften zentrieren.
 \renewcommand*{\raggedsection}{\centering}
 
@@ -138,9 +140,24 @@
 
 \def\punkte{\kern .08em \ldots{}}
 
+% Inhaltsverzeichnis anpassen.
 \setkomafont{partentrypagenumber}{\color{white}}
 \setkomafont{chapterentry}{\normalfont}
 \setkomafont{chapterentrypagenumber}{\color{white}}
+
+% Auffüllen.                   
+\newcounter{modresult}
+                            \newcommand{\fillup}[1]{%
+\setcounter{modresult}{%
+\thepage{}-(\thepage{}/#1)*#1%
+}%
+\ifthenelse{0=\themodresult}%
+{}%
+{\clearpage{}\null{}%
+\fillup{#1}}%
+}
+
+
 
 % ************************ Vorspann ****************************
 \include{titel}
@@ -198,6 +215,14 @@
 \tableofcontents
 
 
+
+
+% Seitenzahl auf durch 4 teilbar auffüllen.
+
+% Keine Kopfzeile, keine Seitennummer.
+\pagestyle{empty}
+% Auf Seitenzahl durch 4 teilbar auffüllen.
+\fillup{4}
 
 
 \end{document}
