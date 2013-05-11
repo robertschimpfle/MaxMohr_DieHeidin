@@ -121,10 +121,10 @@ task stripLatexMarkup(dependsOn: ['resources', 'replaceVersionInfo']) {
 				// Satzzeichen wieder herstellen.
 				ersetzt =
 					ersetzt
-						.replaceAll(/\\aa(nah){0,1}\{\}/, '«')
-						.replaceAll(/\\ae\{\}/, '»')
-						.replaceAll(/\\haa\{\}/, '‹')
-						.replaceAll(/\\hae\{\}/, '›')
+						.replaceAll(/\\aa(nah){0,1}\{\}/, '»')
+						.replaceAll(/\\ae\{\}/, '«')
+						.replaceAll(/\\haa\{\}/, '›')
+						.replaceAll(/\\hae\{\}/, '‹')
 						.replaceAll(/\\dopp\{\}/, ':')
 						.replaceAll(/\\semi\{\}/, ';')
 						.replaceAll(/\\frag\{\}/, '?')
@@ -141,13 +141,17 @@ task stripLatexMarkup(dependsOn: ['resources', 'replaceVersionInfo']) {
 					ersetzt.replaceAll(/"\|/, '')
 
 				// Getrennte Wörter zusammenziehen.
-				ersetzt =
-					ersetzt.replaceAll(/(("-|\\-)%\n)(% [${b}]+\n)*([${b}-]+[${sz}]*)/, '$4\n$3')
+//				ersetzt =
+//					ersetzt.replaceAll(/(("-|\\-)%\n)(% [${b}]+\n)*([${b}-]+[${sz}]*)/, '$4\n$3')
 					
 				// Verbundene Wörter zusammenziehen.
+//				ersetzt =
+//					ersetzt.replaceAll(/(([${b}]+-)%\n)(% [${b}]+\n)*([${b}-]+[${sz}]*)/, '$2$4\n$3')
+
+				// Ersatz für die oben auskommentierten.
 				ersetzt =
-					ersetzt.replaceAll(/(([${b}]+-)%\n)(% [${b}]+\n)*([${b}-]+[${sz}]*)/, '$2$4\n$3')
-					
+					ersetzt.replaceAll(/"-/, '-').replaceAll(/\\-/, '-')
+	
 				// Bindende Zeilenumbrüche entfernen.
 				ersetzt =
 					ersetzt.replaceAll(/\\\\\*/, '\\\\\\\\')
