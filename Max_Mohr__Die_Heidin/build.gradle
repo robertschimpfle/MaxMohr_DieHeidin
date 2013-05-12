@@ -130,6 +130,7 @@ task stripLatexMarkup(dependsOn: ['resources', 'replaceVersionInfo']) {
 						.replaceAll(/\\frag\{\}/, '?')
 						.replaceAll(/\\ausr\{\}/, '!')
 						.replaceAll(/\\punkte\{\}/, '...')
+						.replaceAll(/\\ldots\{\}/, '...')
 
 				// Ersetze Trenner.
 				ersetzt =
@@ -162,7 +163,7 @@ task stripLatexMarkup(dependsOn: ['resources', 'replaceVersionInfo']) {
 					
 				// Eingriff- und Label-Makro samt Inhalt entfernen
 				ersetzt =
-					ersetzt.replaceAll(/\\(eingriff|label)\{.*\}/, '')
+					ersetzt.replaceAll(/\\label\{.*\}/, '').replaceAll(/\\eingriff\{eS[0-9]+-[0-9]+\}\{[^\{]+\}/, '')
 					
 				exec {
 					commandLine('bash', '-c', 'detex - > ' + new File(txtDir, file.name + '.txt'))
